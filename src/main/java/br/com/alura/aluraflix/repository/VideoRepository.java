@@ -5,6 +5,8 @@ import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
-public interface VideoRepository extends MongoRepository<Video, Long> {
+import javax.validation.constraints.NotNull;
+import java.util.Optional;
 
+public interface VideoRepository extends MongoRepository<Video, Long> {
 }

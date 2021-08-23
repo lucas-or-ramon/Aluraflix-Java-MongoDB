@@ -18,7 +18,8 @@ public class Video {
     public Video() {
     }
 
-    public Video(String id, String title, String description, String link) {
+    public Video(Long id, String title, String description, String link) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.link = link;

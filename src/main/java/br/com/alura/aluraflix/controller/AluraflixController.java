@@ -48,8 +48,10 @@ public class AluraflixController {
         return ResponseEntity.ok().body(videoResponse);
     }
 
-    //!
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<VideoResponse> insertVideo(@Valid @RequestBody final VideoRequest videoRequest) {
         Video video = Video.from(videoRequest);
 
@@ -86,6 +88,5 @@ public class AluraflixController {
             return ResponseEntity.ok("Vídeo Deletado!");
         }
         return ResponseEntity.badRequest().body("Problema ao Deletar");
-
     }
 }

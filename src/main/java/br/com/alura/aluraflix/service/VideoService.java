@@ -11,23 +11,20 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 public class VideoService {
 
     @Autowired
-    MongoTemplate mongoTemplate;
+    VideoRepository videoRepository;
 
     @Autowired
     NextSequenceService nextSequenceService;
 
     public List<Video> findAllVideos() {
         try {
-            return mongoTemplate.findAll(Video.class);
+            return videoRepository.findAll();
         } catch (Exception e) {
             return new ArrayList<>();
         }
@@ -35,16 +32,20 @@ public class VideoService {
 
     public Video findVideoById(final Long id) {
         try {
-            return mongoTemplate.findById(id, Video.class);
+            Video video = videoRepository.findById(id).orElse(null);
+            if (Objects.nonNull(video)) {
+                return video;
+            }
         } catch (Exception e) {
             return new Video();
         }
+        return new Video();
     }
 
     public Boolean insertVideo(Video video) {
         try {
             video.setId(nextSequenceService.getNextSequence(Video.SEQUENCE_NAME));
-            mongoTemplate.insert(video);
+            videoRepository.insert(video);
             return true;
         } catch (Exception e) {
             return false;
@@ -57,7 +58,7 @@ public class VideoService {
             video.setDescription(videoDetails.getDescription());
             video.setLink(videoDetails.getLink());
 
-            mongoTemplate.save(video);
+            videoRepository.save(video);
             return true;
 
         } catch (Exception e) {
@@ -70,11 +71,23 @@ public class VideoService {
             Query query = new Query();
             query.addCriteria(Criteria.where("_id").is(id));
 
-            mongoTemplate.remove(query, Video.class);
+            videoRepository.deleteById(id);
             return true;
 
         } catch (Exception e) {
             return false;
         }
+    }
+
+//    public void dropCollection(String collection) throws Exception {
+//        try {
+//            //videoRepository.(collection);
+//        } catch (Exception e) {
+//            throw new Exception("message:", e);
+//        }
+//    }
+
+    public int test(int valor) {
+        return valor;
     }
 }
