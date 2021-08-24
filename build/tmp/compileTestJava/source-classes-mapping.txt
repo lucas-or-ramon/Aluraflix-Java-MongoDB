@@ -1,7 +1,0 @@
-br/com/alura/aluraflix/AluraflixApplicationTest.java
- br.com.alura.aluraflix.AluraflixApplicationTest
-br/com/alura/aluraflix/repository/VideoRepositoryTest.java
- br.com.alura.aluraflix.repository.VideoRepositoryTest
-br/com/alura/aluraflix/VideoServiceTest.java
- br.com.alura.aluraflix.VideoServiceTest
- br.com.alura.aluraflix.VideoServiceTest$VideoServiceTestConfiguration
