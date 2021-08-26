@@ -9,18 +9,20 @@ import java.util.UUID;
 
 public class VideoResponse {
 
-    @JsonProperty("titulo")
-    private String titulo;
+    @JsonProperty("title")
+    private String title;
 
-    @JsonProperty("descricao")
-    private String descricao;
+    @JsonProperty("description")
+    private String description;
 
     @JsonProperty("link")
     private String link;
 
-    public VideoResponse(final Video video) {
-        this.titulo = video.getTitle();
-        this.descricao = video.getDescription();
+    public VideoResponse() {}
+
+    private VideoResponse(final Video video) {
+        this.title = video.getTitle();
+        this.description = video.getDescription();
         this.link = video.getLink();
     }
 
@@ -28,12 +30,12 @@ public class VideoResponse {
         return new VideoResponse(video);
     }
 
-    public String getTitulo() {
-        return titulo;
+    public String getTitle() {
+        return title;
     }
 
-    public String getDescricao() {
-        return descricao;
+    public String getDescription() {
+        return description;
     }
 
     public String getLink() {

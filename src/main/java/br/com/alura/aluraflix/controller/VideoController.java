@@ -22,71 +22,68 @@ import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/videos")
-public class AluraflixController {
+public class VideoController {
 
     @Autowired
     VideoService videoService;
 
+
     @GetMapping
-    public ResponseEntity<List<VideoResponse>> allVideos() {
+    public @ResponseBody List<VideoResponse> allVideos() {
         List<Video> videos = videoService.findAllVideos();
         if (Objects.isNull(videos)) {
-            return ResponseEntity.ok().body(new ArrayList<>());
+            return new ArrayList<>();
         }
-
-        List<VideoResponse> videosResponses = videos.stream().map(VideoResponse::from).collect(Collectors.toList());
-        return ResponseEntity.ok().body(videosResponses);
+        return videos.stream().map(VideoResponse::from).collect(Collectors.toList());
     }
 
     @GetMapping(value = "/{id}")
-    public ResponseEntity<VideoResponse> videoById(@PathVariable Long id) {
+    public @ResponseBody VideoResponse videoById(@PathVariable Long id) {
         Video video = videoService.findVideoById(id);
         if (video == null) {
-            return ResponseEntity.notFound().build();
+            return new VideoResponse();
         }
-        VideoResponse videoResponse = VideoResponse.from(video);
-        return ResponseEntity.ok().body(videoResponse);
+        return VideoResponse.from(video);
     }
 
     @PostMapping(
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<VideoResponse> insertVideo(@Valid @RequestBody final VideoRequest videoRequest) {
+    public @ResponseBody VideoResponse insertVideo(@Valid @RequestBody final VideoRequest videoRequest) {
         Video video = Video.from(videoRequest);
 
         Boolean resp = videoService.insertVideo(video);
         if (resp) {
-            VideoResponse videoResponse = VideoResponse.from(video);
-            return ResponseEntity.ok().body(videoResponse);
+            return VideoResponse.from(video);
         }
-        return ResponseEntity.badRequest().build();
+        return new VideoResponse();
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<VideoResponse> updateVideo(@PathVariable Long id, @Valid @RequestBody final VideoRequest videoRequest) {
+    public @ResponseBody VideoResponse updateVideo(@PathVariable Long id, @Valid @RequestBody final VideoRequest videoRequest) {
         Video video = videoService.findVideoById(id);
         if (video == null){
-            return ResponseEntity.badRequest().build();
+            return new VideoResponse();
         }
 
         Boolean resp = videoService.updateVideo(video, Video.from(videoRequest));
         if (resp) {
-            return ResponseEntity.ok().body(VideoResponse.from(video));
+            return VideoResponse.from(video);
         }
-        return ResponseEntity.badRequest().build();
+        return new VideoResponse();
     }
 
     @DeleteMapping(value = "/{id}")
-    public ResponseEntity<String> deleteVideo(@PathVariable Long id) {
+    public @ResponseBody String deleteVideo(@PathVariable Long id) {
         Video video = videoService.findVideoById(id);
         if (video == null) {
-            return ResponseEntity.badRequest().body("Problema ao Deletar: Vídeo Não Encontrado");
+            return "Problema ao Deletar: Vídeo Não Encontrado";
         }
         Boolean resp = videoService.deleteVideo(id);
         if (resp) {
-            return ResponseEntity.ok("Vídeo Deletado!");
+            return "Vídeo Deletado!";
         }
-        return ResponseEntity.badRequest().body("Problema ao Deletar");
+        return "Problema ao Deletar";
     }
 }
