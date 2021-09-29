@@ -1,4 +1,4 @@
-package br.com.alura.aluraflix.domain;
+package br.com.alura.aluraflix.models;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -8,7 +8,7 @@ public class CustomSequences {
 
     @Id
     private String id;
-    private Long seq;
+    private Integer seq;
 
     public String getId() {
         return id;
@@ -18,11 +18,11 @@ public class CustomSequences {
         this.id = id;
     }
 
-    public Long getSeq() {
+    public Integer getSeq() {
         return seq;
     }
 
-    public void setSeq(Long seq) {
+    public void setSeq(Integer seq) {
         this.seq = seq;
     }
 }

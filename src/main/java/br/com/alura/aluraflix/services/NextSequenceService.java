@@ -1,6 +1,6 @@
-package br.com.alura.aluraflix.service;
+package br.com.alura.aluraflix.services;
 
-import br.com.alura.aluraflix.domain.CustomSequences;
+import br.com.alura.aluraflix.models.CustomSequences;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.query.Query;
@@ -17,7 +17,7 @@ public class NextSequenceService {
     @Autowired
     private MongoOperations mongo;
 
-    public Long getNextSequence(String seqName) {
+    public Integer getNextSequence(String seqName) {
         Query query = new Query();
         query.addCriteria(Criteria.where("_id").is(seqName));
 
