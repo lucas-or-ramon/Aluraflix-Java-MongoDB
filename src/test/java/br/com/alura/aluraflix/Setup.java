@@ -1,8 +1,7 @@
 package br.com.alura.aluraflix;
 
-import br.com.alura.aluraflix.controllers.request.CategoryRequest;
-import br.com.alura.aluraflix.controllers.request.VideoRequest;
 import br.com.alura.aluraflix.models.Category;
+import br.com.alura.aluraflix.models.CustomSequences;
 import br.com.alura.aluraflix.models.Video;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
@@ -31,6 +30,8 @@ public class Setup {
         mongoTemplate.insert(new Category(1, "LIVRE", "Branco"));
         mongoTemplate.insert(new Category(2, "JAVA", "Azul"));
         mongoTemplate.insert(new Category(3, "SPRING", "Rosa"));
+        mongoTemplate.insert(new CustomSequences("videoSequences", 7));
+        mongoTemplate.insert(new CustomSequences("categorySequence", 3));
 
         System.setProperty("free_category", "1");
         System.setProperty("page_limit", "5");
