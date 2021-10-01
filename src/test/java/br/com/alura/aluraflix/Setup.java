@@ -1,7 +1,5 @@
 package br.com.alura.aluraflix;
 
-import br.com.alura.aluraflix.controllers.request.CategoryRequest;
-import br.com.alura.aluraflix.controllers.request.VideoRequest;
 import br.com.alura.aluraflix.models.Category;
 import br.com.alura.aluraflix.models.CustomSequences;
 import br.com.alura.aluraflix.models.Video;

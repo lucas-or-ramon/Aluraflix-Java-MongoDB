@@ -10,6 +10,11 @@ public class CustomSequences {
     private String id;
     private Integer seq;
 
+    public CustomSequences(String id, Integer seq) {
+        this.id = id;
+        this.seq = seq;
+    }
+
     public String getId() {
         return id;
     }
