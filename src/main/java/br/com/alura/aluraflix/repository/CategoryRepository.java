@@ -25,7 +25,7 @@ public class CategoryRepository implements CategoryService {
     public Page<Category> findCategories(Pageable pageable) {
         try {
             Query query = new Query().with(pageable);
-            List<Category> categoryPage = mongoTemplate.findAll(Category.class);
+            List<Category> categoryPage = mongoTemplate.find(query, Category.class);
             long count = mongoTemplate.count(query.skip(-1).limit(-1), Category.class);
             return new PageImpl<>(categoryPage, pageable, count);
         } catch (Exception e) {

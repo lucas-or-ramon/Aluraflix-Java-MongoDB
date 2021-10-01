@@ -1,6 +1,7 @@
 package br.com.alura.aluraflix;
 
 
+import br.com.alura.aluraflix.controllers.request.VideoRequest;
 import br.com.alura.aluraflix.models.Video;
 import br.com.alura.aluraflix.controllers.Properties;
 import br.com.alura.aluraflix.services.VideoService;
@@ -17,7 +18,7 @@ import java.util.Optional;
 
 @SpringBootTest
 @ActiveProfiles("test")
-public class VideoTest extends Setup{
+public class VideoTest extends Setup {
 
     @Autowired
     VideoService videoService;
@@ -46,5 +47,37 @@ public class VideoTest extends Setup{
 
         Assertions.assertEquals("Título do Video 1", video.getTitle());
         Assertions.assertTrue(optionalVideo.isEmpty());
+    }
+
+    @Test
+    public void deve_retornar_true_devido_inserir_video_com_sucesso() {
+        Video video = Video.from(new VideoRequest("Título do Video 20", "Descrição do Vídeo 20", "video20.com", 1));
+        video.setId(20);
+
+        boolean result = videoService.insertOrUpdateVideo(video);
+
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    public void deve_retornar_true_devido_atualizar_video_com_sucesso() {
+        Video video = Video.from(new VideoRequest("Título do Video 20 Atualizado", "Descrição do Vídeo 20", "video20.com", 1));
+        video.setId(20);
+
+        boolean result = videoService.insertOrUpdateVideo(video);
+
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    public void deve_retornar_true_devido_deletar_video_com_sucesso() {
+        boolean result = videoService.deleteVideo(20);
+        Assertions.assertTrue(result);
+    }
+
+    @Test
+    public void deve_retornar_true_devido_existir_video_com_id_especifico() {
+        boolean result = videoService.existsById(1);
+        Assertions.assertTrue(result);
     }
 }
