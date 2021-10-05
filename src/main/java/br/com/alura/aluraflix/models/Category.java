@@ -5,10 +5,8 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.List;
-
 @Data
-@Document(collection = "alura_categories")
+@Document(collection = "categories")
 public class Category {
 
     public static final String SEQUENCE_NAME = "categorySequence";

@@ -4,15 +4,23 @@ import br.com.alura.aluraflix.controllers.request.LoginRequest;
 import br.com.alura.aluraflix.controllers.request.SignupRequest;
 import br.com.alura.aluraflix.controllers.response.JwtResponse;
 import br.com.alura.aluraflix.controllers.response.MessageResponse;
+import br.com.alura.aluraflix.controllers.response.VideoResponse;
 import br.com.alura.aluraflix.models.ERole;
 import br.com.alura.aluraflix.models.Role;
 import br.com.alura.aluraflix.models.User;
+import br.com.alura.aluraflix.models.Video;
 import br.com.alura.aluraflix.repository.RoleRepository;
 import br.com.alura.aluraflix.repository.UserRepository;
 import br.com.alura.aluraflix.security.jwt.JwtUtils;
 import br.com.alura.aluraflix.security.services.UserDetailsImpl;
+import br.com.alura.aluraflix.services.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -27,10 +35,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static br.com.alura.aluraflix.controllers.Properties.FREE_CATEGORY;
+import static br.com.alura.aluraflix.controllers.Properties.PAGE_LIMIT;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/public/auth")
-public class PublicAuthController {
+@RequestMapping("/start")
+public class PublicController {
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -40,6 +51,9 @@ public class PublicAuthController {
 
     @Autowired
     RoleRepository roleRepository;
+
+    @Autowired
+    VideoService videoService;
 
     @Autowired
     PasswordEncoder encoder;
@@ -71,7 +85,6 @@ public class PublicAuthController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
         }
 
-        //Criar uma nova conta de usuário
         User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()));
 
         Set<String> strRoles = signupRequest.getRoles();
@@ -82,18 +95,12 @@ public class PublicAuthController {
             roles.add(userRole);
         } else {
             strRoles.forEach(role -> {
-                switch (role) {
-                    case "admin":
-                        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(adminRole);
-                        break;
-                    case "mod":
-                        Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(modRole);
-                        break;
-                    default:
-                        Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                        roles.add(userRole);
+                if ("mod".equals(role)) {
+                    Role modRole = roleRepository.findByName(ERole.ROLE_MODERATOR).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(modRole);
+                } else {
+                    Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+                    roles.add(userRole);
                 }
             });
         }
@@ -108,5 +115,20 @@ public class PublicAuthController {
     public ResponseEntity<?> logoutUser() {
         SecurityContextHolder.getContext().setAuthentication(null);
         return ResponseEntity.ok(new MessageResponse("logout successful"));
+    }
+
+    @GetMapping(
+            value = "/free",
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getFreeVideos(@RequestParam int page) {
+
+        Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
+
+        Page<Video> videoPage = videoService.findVideosByCategory(pageable, FREE_CATEGORY);
+
+        if (videoPage.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
+        return ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
     }
 }

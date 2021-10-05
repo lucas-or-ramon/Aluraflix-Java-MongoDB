@@ -8,7 +8,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import static br.com.alura.aluraflix.controllers.Properties.*;
 
 @Data
-@Document(collection = "alura_videos")
+@Document(collection = "videos")
 public class Video {
 
     public static final String SEQUENCE_NAME = "videoSequences";

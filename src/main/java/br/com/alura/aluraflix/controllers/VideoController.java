@@ -23,9 +23,9 @@ import static br.com.alura.aluraflix.controllers.Properties.*;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/protected/videos")
-@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-public class ProtectedVideoController {
+@RequestMapping("/api/videos")
+@PreAuthorize("hasRole('USER') or hasRole('MODERATOR')")
+public class VideoController {
 
     @Autowired
     VideoService videoService;
