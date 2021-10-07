@@ -3,6 +3,7 @@ package br.com.alura.aluraflix.controllers;
 import br.com.alura.aluraflix.controllers.request.VideoRequest;
 import br.com.alura.aluraflix.controllers.response.MessageResponse;
 import br.com.alura.aluraflix.controllers.response.VideoResponse;
+import br.com.alura.aluraflix.models.Category;
 import br.com.alura.aluraflix.models.Video;
 import br.com.alura.aluraflix.repository.CategoryRepository;
 import br.com.alura.aluraflix.repository.VideoRepository;
@@ -20,9 +21,6 @@ import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-
-import static br.com.alura.aluraflix.controllers.Properties.FREE_CATEGORY;
-import static br.com.alura.aluraflix.controllers.Properties.PAGE_LIMIT;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -42,7 +40,7 @@ public class VideoController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getVideos(@RequestParam(required = false) String search, @RequestParam int page) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(page, Video.PAGE_LIMIT);
 
         Page<Video> videoPage = videoRepository.findVideos(pageable, search);
 
@@ -72,7 +70,7 @@ public class VideoController {
     public ResponseEntity<?> insertVideo(@Valid @RequestBody final VideoRequest videoRequest) {
 
         if (videoRequest.getCategoryId() == null) {
-            videoRequest.setCategoryId(FREE_CATEGORY);
+            videoRequest.setCategoryId(Category.FREE_CATEGORY);
         } else if (!categoryRepository.existsById(videoRequest.getCategoryId())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
         }
@@ -104,7 +102,7 @@ public class VideoController {
         if (videoRepository.existsById(id)) {
 
             if (videoRequest.getCategoryId() == null) {
-                videoRequest.setCategoryId(FREE_CATEGORY);
+                videoRequest.setCategoryId(Category.FREE_CATEGORY);
             } else if (!categoryRepository.existsById(videoRequest.getCategoryId())) {
                 return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
             }

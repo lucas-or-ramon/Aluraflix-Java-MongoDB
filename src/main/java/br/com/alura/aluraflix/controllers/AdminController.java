@@ -23,8 +23,6 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-import static br.com.alura.aluraflix.controllers.Properties.PAGE_LIMIT;
-
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -84,7 +82,7 @@ public class AdminController {
     )
     public ResponseEntity<?> getAllUsers(@RequestParam int page) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(page, User.PAGE_LIMIT);
 
         Page<User> userPage = userRepository.findAll(pageable);
 

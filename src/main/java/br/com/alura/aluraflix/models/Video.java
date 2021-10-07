@@ -10,6 +10,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Video {
 
     public static final String SEQUENCE_NAME = "videoSequences";
+    public static final Integer PAGE_LIMIT = 5;
 
     @Id
     private Integer id;

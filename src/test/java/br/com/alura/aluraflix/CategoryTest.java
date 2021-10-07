@@ -1,6 +1,5 @@
 package br.com.alura.aluraflix;
 
-import br.com.alura.aluraflix.controllers.Properties;
 import br.com.alura.aluraflix.controllers.request.CategoryRequest;
 import br.com.alura.aluraflix.models.Category;
 import br.com.alura.aluraflix.models.Video;
@@ -30,14 +29,14 @@ public class CategoryTest extends Setup {
     @Test
     public void deve_retornar_paginas_1_2_de_todas_as_categorias_devido_paginacao() {
 
-        Pageable pageable = PageRequest.of(0, Properties.PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(0, Category.PAGE_LIMIT);
         Page<Category> categoryPage1 = categoryRepository.findCategories(pageable);
 
-        pageable = PageRequest.of(1, Properties.PAGE_LIMIT);
+        pageable = PageRequest.of(1, Category.PAGE_LIMIT);
         Page<Category> categoryPage2 = categoryRepository.findCategories(pageable);
 
-        Assertions.assertEquals(5, categoryPage1.get().count());
-        Assertions.assertEquals(1, categoryPage2.get().count());
+        Assertions.assertEquals(6, categoryPage1.get().count());
+        Assertions.assertTrue(categoryPage2.isEmpty());
     }
 
     @Test
@@ -83,10 +82,10 @@ public class CategoryTest extends Setup {
 
     @Test
     public void deve_retornar_pagina_1_com_videos_e_pagina_2_sem_videos_devido_pesquisa_por_id() {
-        Pageable pageable = PageRequest.of(0, Properties.PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(0, Video.PAGE_LIMIT);
         Page<Video> videoPage1 = videoRepository.findVideosByCategory(pageable, 2);
 
-        pageable = PageRequest.of(1, Properties.PAGE_LIMIT);
+        pageable = PageRequest.of(1, Video.PAGE_LIMIT);
         Page<Video> videoPage2 = videoRepository.findVideosByCategory(pageable, 2);
 
         Assertions.assertEquals(2, videoPage1.get().count());

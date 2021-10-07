@@ -5,15 +5,12 @@ import br.com.alura.aluraflix.controllers.request.SignupRequest;
 import br.com.alura.aluraflix.controllers.response.JwtResponse;
 import br.com.alura.aluraflix.controllers.response.MessageResponse;
 import br.com.alura.aluraflix.controllers.response.VideoResponse;
-import br.com.alura.aluraflix.models.ERole;
-import br.com.alura.aluraflix.models.Role;
-import br.com.alura.aluraflix.models.User;
-import br.com.alura.aluraflix.models.Video;
+import br.com.alura.aluraflix.models.*;
 import br.com.alura.aluraflix.repository.RoleRepository;
 import br.com.alura.aluraflix.repository.UserRepository;
+import br.com.alura.aluraflix.repository.VideoRepository;
 import br.com.alura.aluraflix.security.jwt.JwtUtils;
 import br.com.alura.aluraflix.security.services.UserDetailsImpl;
-import br.com.alura.aluraflix.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -33,9 +30,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
-
-import static br.com.alura.aluraflix.controllers.Properties.FREE_CATEGORY;
-import static br.com.alura.aluraflix.controllers.Properties.PAGE_LIMIT;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -60,9 +54,10 @@ public class PublicController {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @PostMapping(value = "/signin",
-                consumes = MediaType.APPLICATION_JSON_VALUE,
-                produces = MediaType.APPLICATION_JSON_VALUE
+    @PostMapping(
+            value = "/signin",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
@@ -129,9 +124,9 @@ public class PublicController {
     )
     public ResponseEntity<?> getFreeVideos(@RequestParam int page) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(page, User.PAGE_LIMIT);
 
-        Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, FREE_CATEGORY);
+        Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, Category.FREE_CATEGORY);
 
         if (videoPage.isEmpty()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Videos not found"));

@@ -14,6 +14,9 @@ import java.util.Set;
 @Data
 @Document(collection = "users")
 public class User {
+
+    public static final Integer PAGE_LIMIT = 8;
+
     @Id
     private String id;
 

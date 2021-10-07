@@ -10,7 +10,8 @@ import org.springframework.data.mongodb.core.mapping.Document;
 public class Category {
 
     public static final String SEQUENCE_NAME = "categorySequence";
-
+    public static final Integer FREE_CATEGORY = 1;
+    public static final Integer PAGE_LIMIT = 10;
     @Id
     private Integer id;
     private String title;

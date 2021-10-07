@@ -3,9 +3,8 @@ package br.com.alura.aluraflix;
 
 import br.com.alura.aluraflix.controllers.request.VideoRequest;
 import br.com.alura.aluraflix.models.Video;
-import br.com.alura.aluraflix.controllers.Properties;
-import br.com.alura.aluraflix.services.NextSequenceService;
 import br.com.alura.aluraflix.repository.VideoRepository;
+import br.com.alura.aluraflix.services.NextSequenceService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,13 +29,13 @@ public class VideoTest extends Setup {
     @Test
     public void deve_retornar_paginas_1_2_e_a_3_vazia_de_todos_os_videos_devido_paginacao() {
 
-        Pageable pageable = PageRequest.of(0, Properties.PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(0, Video.PAGE_LIMIT);
         Page<Video> videoPage1 = videoRepository.findVideos(pageable, null);
 
-        pageable = PageRequest.of(1, Properties.PAGE_LIMIT);
+        pageable = PageRequest.of(1, Video.PAGE_LIMIT);
         Page<Video> videoPage2 = videoRepository.findVideos(pageable, null);
 
-        pageable = PageRequest.of(2, Properties.PAGE_LIMIT);
+        pageable = PageRequest.of(2, Video.PAGE_LIMIT);
         Page<Video> videoPage3 = videoRepository.findVideos(pageable, null);
 
         Assertions.assertEquals(5, videoPage1.get().count());
@@ -46,10 +45,10 @@ public class VideoTest extends Setup {
 
     @Test
     public void deve_retornar_pagina_1_com_video_5_e_pagina_2_sem_videos_devido_pesquisa() {
-        Pageable pageable = PageRequest.of(0, Properties.PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(0, Video.PAGE_LIMIT);
         Page<Video> videoPage1 = videoRepository.findVideos(pageable, "5");
 
-        pageable = PageRequest.of(1, Properties.PAGE_LIMIT);
+        pageable = PageRequest.of(1, Video.PAGE_LIMIT);
         Page<Video> videoPage2 = videoRepository.findVideos(pageable, "5");
 
         Assertions.assertEquals(1, videoPage1.get().count());

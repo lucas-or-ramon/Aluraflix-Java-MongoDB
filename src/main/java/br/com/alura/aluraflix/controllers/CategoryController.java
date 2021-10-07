@@ -23,8 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static br.com.alura.aluraflix.controllers.Properties.PAGE_LIMIT;
-
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping(value = "/api/categories")
@@ -43,7 +41,7 @@ public class CategoryController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getCategories(@RequestParam int page) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
+        Pageable pageable = PageRequest.of(page, Category.PAGE_LIMIT);
 
         Page<Category> categoryPage = categoryRepository.findCategories(pageable);
 
@@ -129,7 +127,7 @@ public class CategoryController {
     public ResponseEntity<?> getVideosByCategory(@PathVariable Integer categoryId, @RequestParam int page) {
 
         if (categoryRepository.existsById(categoryId)) {
-            Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
+            Pageable pageable = PageRequest.of(page, Video.PAGE_LIMIT);
 
             Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, categoryId);
 
