@@ -5,8 +5,6 @@ import lombok.Data;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import static br.com.alura.aluraflix.controllers.Properties.*;
-
 @Data
 @Document(collection = "videos")
 public class Video {

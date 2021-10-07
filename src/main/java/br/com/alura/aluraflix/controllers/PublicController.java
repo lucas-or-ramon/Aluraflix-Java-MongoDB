@@ -13,14 +13,13 @@ import br.com.alura.aluraflix.repository.RoleRepository;
 import br.com.alura.aluraflix.repository.UserRepository;
 import br.com.alura.aluraflix.security.jwt.JwtUtils;
 import br.com.alura.aluraflix.security.services.UserDetailsImpl;
-import br.com.alura.aluraflix.services.VideoService;
+import br.com.alura.aluraflix.repository.VideoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -44,24 +43,27 @@ import static br.com.alura.aluraflix.controllers.Properties.PAGE_LIMIT;
 public class PublicController {
 
     @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
-    UserRepository userRepository;
+    JwtUtils jwtUtils;
 
     @Autowired
     RoleRepository roleRepository;
 
     @Autowired
-    VideoService videoService;
+    UserRepository userRepository;
 
     @Autowired
-    PasswordEncoder encoder;
+    PasswordEncoder passwordEncoder;
 
     @Autowired
-    JwtUtils jwtUtils;
+    VideoRepository videoRepository;
 
-    @PostMapping("/signin")
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @PostMapping(value = "/signin",
+                consumes = MediaType.APPLICATION_JSON_VALUE,
+                produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
@@ -75,7 +77,11 @@ public class PublicController {
         return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles));
     }
 
-    @PostMapping("/signup")
+    @PostMapping(
+            value = "/signup",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
         if (userRepository.existsByUsername(signupRequest.getUsername())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
@@ -85,7 +91,7 @@ public class PublicController {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
         }
 
-        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), encoder.encode(signupRequest.getPassword()));
+        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), passwordEncoder.encode(signupRequest.getPassword()));
 
         Set<String> strRoles = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
@@ -114,20 +120,21 @@ public class PublicController {
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser() {
         SecurityContextHolder.getContext().setAuthentication(null);
-        return ResponseEntity.ok(new MessageResponse("logout successful"));
+        return ResponseEntity.ok(new MessageResponse("Logout successful"));
     }
 
     @GetMapping(
             value = "/free",
-            produces = MediaType.APPLICATION_JSON_VALUE)
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<?> getFreeVideos(@RequestParam int page) {
 
         Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
 
-        Page<Video> videoPage = videoService.findVideosByCategory(pageable, FREE_CATEGORY);
+        Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, FREE_CATEGORY);
 
         if (videoPage.isEmpty()) {
-            return ResponseEntity.noContent().build();
+            return ResponseEntity.badRequest().body(new MessageResponse("Videos not found"));
         }
         return ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
     }

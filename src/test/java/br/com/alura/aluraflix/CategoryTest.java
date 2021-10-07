@@ -4,8 +4,8 @@ import br.com.alura.aluraflix.controllers.Properties;
 import br.com.alura.aluraflix.controllers.request.CategoryRequest;
 import br.com.alura.aluraflix.models.Category;
 import br.com.alura.aluraflix.models.Video;
-import br.com.alura.aluraflix.services.CategoryService;
-import br.com.alura.aluraflix.services.VideoService;
+import br.com.alura.aluraflix.repository.CategoryRepository;
+import br.com.alura.aluraflix.repository.VideoRepository;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,19 +22,19 @@ import java.util.Optional;
 public class CategoryTest extends Setup {
 
     @Autowired
-    CategoryService categoryService;
+    CategoryRepository categoryRepository;
 
     @Autowired
-    VideoService videoService;
+    VideoRepository videoRepository;
 
     @Test
     public void deve_retornar_paginas_1_2_de_todas_as_categorias_devido_paginacao() {
 
         Pageable pageable = PageRequest.of(0, Properties.PAGE_LIMIT);
-        Page<Category> categoryPage1 = categoryService.findCategories(pageable);
+        Page<Category> categoryPage1 = categoryRepository.findCategories(pageable);
 
         pageable = PageRequest.of(1, Properties.PAGE_LIMIT);
-        Page<Category> categoryPage2 = categoryService.findCategories(pageable);
+        Page<Category> categoryPage2 = categoryRepository.findCategories(pageable);
 
         Assertions.assertEquals(5, categoryPage1.get().count());
         Assertions.assertEquals(1, categoryPage2.get().count());
@@ -42,8 +42,8 @@ public class CategoryTest extends Setup {
 
     @Test
     public void deve_retornar_categoria_encontrada_por_id_e_nao_encontrada_por_id() {
-        Category category = categoryService.findCategoryById(1).orElse(new Category());
-        Optional<Category> categoryOptional = categoryService.findCategoryById(100);
+        Category category = categoryRepository.findCategoryById(1).orElse(new Category());
+        Optional<Category> categoryOptional = categoryRepository.findCategoryById(100);
 
         Assertions.assertEquals("LIVRE", category.getTitle());
         Assertions.assertTrue(categoryOptional.isEmpty());
@@ -54,7 +54,7 @@ public class CategoryTest extends Setup {
         Category category = Category.from(new CategoryRequest("PYTHON", "Amarela"));
         category.setId(20);
 
-        boolean result = categoryService.insertOrUpdateCategory(category);
+        boolean result = categoryRepository.insertOrUpdateCategory(category);
 
         Assertions.assertTrue(result);
     }
@@ -64,30 +64,30 @@ public class CategoryTest extends Setup {
         Category category = Category.from(new CategoryRequest("PYTHON", "Vermelha"));
         category.setId(20);
 
-        boolean result = categoryService.insertOrUpdateCategory(category);
+        boolean result = categoryRepository.insertOrUpdateCategory(category);
 
         Assertions.assertTrue(result);
     }
 
     @Test
     public void deve_retornar_true_devido_deletar_categoria_com_sucesso() {
-        boolean result = categoryService.deleteCategory(20);
+        boolean result = categoryRepository.deleteCategory(20);
         Assertions.assertTrue(result);
     }
 
     @Test
     public void deve_retornar_true_devido_existir_categoria() {
-        boolean result = categoryService.existsById(1);
+        boolean result = categoryRepository.existsById(1);
         Assertions.assertTrue(result);
     }
 
     @Test
     public void deve_retornar_pagina_1_com_videos_e_pagina_2_sem_videos_devido_pesquisa_por_id() {
         Pageable pageable = PageRequest.of(0, Properties.PAGE_LIMIT);
-        Page<Video> videoPage1 = videoService.findVideosByCategory(pageable, 2);
+        Page<Video> videoPage1 = videoRepository.findVideosByCategory(pageable, 2);
 
         pageable = PageRequest.of(1, Properties.PAGE_LIMIT);
-        Page<Video> videoPage2 = videoService.findVideosByCategory(pageable, 2);
+        Page<Video> videoPage2 = videoRepository.findVideosByCategory(pageable, 2);
 
         Assertions.assertEquals(2, videoPage1.get().count());
         Assertions.assertTrue(videoPage2.isEmpty());

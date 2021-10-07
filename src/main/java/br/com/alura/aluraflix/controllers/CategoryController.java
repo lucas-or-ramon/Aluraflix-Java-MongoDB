@@ -6,9 +6,9 @@ import br.com.alura.aluraflix.controllers.response.MessageResponse;
 import br.com.alura.aluraflix.controllers.response.VideoResponse;
 import br.com.alura.aluraflix.models.Category;
 import br.com.alura.aluraflix.models.Video;
-import br.com.alura.aluraflix.services.CategoryService;
+import br.com.alura.aluraflix.repository.CategoryRepository;
+import br.com.alura.aluraflix.repository.VideoRepository;
 import br.com.alura.aluraflix.services.NextSequenceService;
-import br.com.alura.aluraflix.services.VideoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -19,9 +19,11 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
-import static br.com.alura.aluraflix.controllers.Properties.*;
+import static br.com.alura.aluraflix.controllers.Properties.PAGE_LIMIT;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
@@ -30,10 +32,10 @@ import static br.com.alura.aluraflix.controllers.Properties.*;
 public class CategoryController {
 
     @Autowired
-    VideoService videoService;
+    VideoRepository videoRepository;
 
     @Autowired
-    CategoryService categoryService;
+    CategoryRepository categoryRepository;
 
     @Autowired
     NextSequenceService nextSequenceService;
@@ -43,10 +45,10 @@ public class CategoryController {
 
         Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
 
-        Page<Category> categoryPage = categoryService.findCategories(pageable);
+        Page<Category> categoryPage = categoryRepository.findCategories(pageable);
 
         if (categoryPage.isEmpty()) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Not Found Categories"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Categories not found"));
         }
         return ResponseEntity.ok(CategoryResponse.fromList(categoryPage.toList()));
     }
@@ -56,12 +58,12 @@ public class CategoryController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> getCategoryById(@PathVariable Integer id) {
-        Optional<Category> optionalCategory = categoryService.findCategoryById(id);
+        Optional<Category> optionalCategory = categoryRepository.findCategoryById(id);
 
         if (optionalCategory.isPresent()) {
             return ResponseEntity.ok(CategoryResponse.from(optionalCategory.get()));
         }
-        return ResponseEntity.badRequest().body(new MessageResponse("Not Found Category"));
+        return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
     }
 
     @PostMapping(
@@ -70,11 +72,20 @@ public class CategoryController {
     )
     public ResponseEntity<?> insertCategory(@Valid @RequestBody final CategoryRequest categoryRequest) {
         Category category = Category.from(categoryRequest);
-        category.setId(nextSequenceService.getNextSequence(Video.SEQUENCE_NAME));
-        if (categoryService.insertOrUpdateCategory(category)) {
+        category.setId(nextSequenceService.getNextSequence(Category.SEQUENCE_NAME));
+        if (categoryRepository.insertOrUpdateCategory(category)) {
             return ResponseEntity.ok(CategoryResponse.from(category));
         }
-        return ResponseEntity.badRequest().body(new MessageResponse("Not Inserted Category"));
+        return ResponseEntity.badRequest().body(new MessageResponse("Category not inserted"));
+    }
+
+    @PostMapping(
+            value = "/many",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
+    public List<ResponseEntity<?>> insertManyCategories(@Valid @RequestBody final List<CategoryRequest> categoryRequests) {
+        return categoryRequests.stream().map(this::insertCategory).collect(Collectors.toList());
     }
 
     @PutMapping(
@@ -83,28 +94,31 @@ public class CategoryController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     public ResponseEntity<?> updateCategory(@PathVariable Integer id, @Valid @RequestBody final CategoryRequest categoryRequest) {
-        if (categoryService.existsById(id)) {
+        if (categoryRepository.existsById(id)) {
             Category category = Category.from(categoryRequest);
             category.setId(id);
 
-            if (categoryService.insertOrUpdateCategory(category)) {
+            if (categoryRepository.insertOrUpdateCategory(category)) {
                 return ResponseEntity.ok(CategoryResponse.from(category));
             }
-            return ResponseEntity.badRequest().body(new MessageResponse("Not Updated Category"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Category not updated"));
         } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Not Found Category"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
         }
     }
 
-    @DeleteMapping(value = "/{id}")
+    @DeleteMapping(
+            value = "/{id}",
+            produces = MediaType.APPLICATION_JSON_VALUE
+    )
     public ResponseEntity<?> deleteCategory(@PathVariable Integer id) {
-        if (categoryService.existsById(id)) {
-            if (categoryService.deleteCategory(id)) {
-                return ResponseEntity.ok(new MessageResponse("Deleted Category"));
+        if (categoryRepository.existsById(id)) {
+            if (categoryRepository.deleteCategory(id)) {
+                return ResponseEntity.ok(new MessageResponse("Deleted category"));
             }
             return ResponseEntity.internalServerError().build();
         } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Not Found Category"));
+            return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
         }
     }
 
@@ -114,13 +128,17 @@ public class CategoryController {
     )
     public ResponseEntity<?> getVideosByCategory(@PathVariable Integer categoryId, @RequestParam int page) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
+        if (categoryRepository.existsById(categoryId)) {
+            Pageable pageable = PageRequest.of(page, PAGE_LIMIT);
 
-        Page<Video> videoPage = videoService.findVideosByCategory(pageable, categoryId);
+            Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, categoryId);
 
-        if (videoPage.isEmpty()) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Not Found Videos"));
+            if (videoPage.isEmpty()) {
+                return ResponseEntity.badRequest().body(new MessageResponse("Videos not found"));
+            }
+            return ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
+        } else {
+            return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
         }
-        return ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
     }
 }
