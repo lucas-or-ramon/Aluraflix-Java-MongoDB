@@ -1,1 +1,1 @@
-web: java -jar build/libs/Aluraflix-1.0-SNAPSHOT-plain.jar
+web: java -jar build/libs/Aluraflix-1.0-SNAPSHOT.jar
