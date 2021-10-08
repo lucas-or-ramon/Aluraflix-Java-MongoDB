@@ -81,7 +81,7 @@ public class VideoController {
         if (videoRepository.insertOrUpdateVideo(video)) {
             return ResponseEntity.ok(VideoResponse.from(video));
         }
-        return ResponseEntity.badRequest().body(new MessageResponse("Video not found"));
+        return ResponseEntity.badRequest().body(new MessageResponse("Video not inserted"));
     }
 
     @PostMapping(

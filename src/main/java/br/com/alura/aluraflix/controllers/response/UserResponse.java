@@ -1,5 +1,6 @@
 package br.com.alura.aluraflix.controllers.response;
 
+import br.com.alura.aluraflix.models.ERole;
 import br.com.alura.aluraflix.models.Role;
 import br.com.alura.aluraflix.models.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -17,11 +18,11 @@ public class UserResponse {
     private String username;
 
     @JsonProperty("roles")
-    private Set<Role> roles;
+    private Set<ERole> roles;
 
     private UserResponse(User user) {
         this.username = user.getUsername();
-        this.roles = user.getRoles();
+        this.roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
     }
 
     public static UserResponse from(User user) {

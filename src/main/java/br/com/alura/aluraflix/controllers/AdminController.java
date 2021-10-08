@@ -80,7 +80,7 @@ public class AdminController {
             value = "/users",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getAllUsers(@RequestParam int page) {
+    public ResponseEntity<?> GetUsers(@RequestParam int page) {
 
         Pageable pageable = PageRequest.of(page, User.PAGE_LIMIT);
 
@@ -96,7 +96,7 @@ public class AdminController {
             value = "/users/{username}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getUserById(@PathVariable String username) {
+    public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
 
         if (userOptional.isPresent()) {

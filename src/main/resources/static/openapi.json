@@ -13,9 +13,9 @@
   "paths": {
     "/api/videos/{id}": {
       "get": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "video-controller"
         ],
@@ -45,9 +45,19 @@
           "400": {
             "description": "Error: Bad Request",
             "content": {
-              "application/json": {
+               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -55,9 +65,9 @@
         }
       },
       "put": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "video-controller"
         ],
@@ -97,9 +107,19 @@
           "400": {
             "description": "Error: Bad Request",
             "content": {
-              "application/json": {
+               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -107,9 +127,9 @@
         }
       },
       "delete": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "video-controller"
         ],
@@ -131,7 +151,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref":  "#/components/schemas/MessageResponseSuccess"
                 }
               }
             }
@@ -139,9 +159,19 @@
           "400": {
             "description": "Error: Bad Request",
             "content": {
-              "application/json": {
+               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -151,9 +181,9 @@
     },
     "/api/categories/{id}": {
       "get": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "category-controller"
         ],
@@ -183,9 +213,19 @@
           "400": {
             "description": "Error: Bad Request",
             "content": {
-              "application/json": {
+               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -193,9 +233,9 @@
         }
       },
       "put": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "category-controller"
         ],
@@ -235,9 +275,19 @@
           "400": {
             "description": "Error: Bad Request",
             "content": {
-              "application/json": {
+               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -245,9 +295,9 @@
         }
       },
       "delete": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "category-controller"
         ],
@@ -269,7 +319,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref":  "#/components/schemas/MessageResponseSuccess"
                 }
               }
             }
@@ -277,9 +327,19 @@
           "400": {
             "description": "Error: Bad Request",
             "content": {
-              "application/json": {
+               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -309,7 +369,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref":  "#/components/schemas/MessageResponseSuccess"
                 }
               }
             }
@@ -339,7 +399,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/LoginResponse"
                 }
               }
             }
@@ -359,7 +419,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/MessageResponseSuccess"
                 }
               }
             }
@@ -369,9 +429,9 @@
     },
     "/api/videos": {
       "get": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "video-controller"
         ],
@@ -403,7 +463,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/VideoResponse",
+                    "$ref": "#/components/schemas/VideoResponse"
                   }
                 }
               }
@@ -412,9 +472,19 @@
           "400": {
             "description": "Error: Bad Request",
             "content": {
-              "application/json": {
+               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -422,9 +492,9 @@
         }
       },
       "post": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "video-controller"
         ],
@@ -449,15 +519,25 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/videos/many": {
       "post": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "video-controller"
         ],
@@ -488,15 +568,25 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/categories": {
       "get": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "category-controller"
         ],
@@ -525,13 +615,33 @@
                 }
               }
             }
+          },
+          "400": {
+            "description": "Error: Bad Request",
+            "content": {
+               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
+                }
+              }
+            }
           }
         }
       },
       "post": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "category-controller"
         ],
@@ -556,15 +666,25 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/categories/many": {
       "post": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "category-controller"
         ],
@@ -595,15 +715,25 @@
                 }
               }
             }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
+                }
+              }
+            }
           }
         }
       }
     },
     "/api/admin/signup": {
       "post": {
-        "security": [
-          "BearerAdminAuth": []
-        ],
+         "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "admin-controller"
         ],
@@ -624,7 +754,17 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref":  "#/components/schemas/MessageResponseSuccess"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -655,7 +795,10 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/VideoResponse" 
+                  }
                 }
               }
             }
@@ -665,9 +808,9 @@
     },
     "/api/categories/{categoryId}/videos": {
       "get": {
-        "security": [
-          "BearerUserAuth": []
-        ],
+        "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "category-controller"
         ],
@@ -698,7 +841,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "array",
+                  "items": {
+                    "$ref":  "#/components/schemas/VideoResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request",
+            "content": {
+               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -708,13 +874,13 @@
     },
     "/api/admin/users": {
       "get": {
-        "security": [
-          "BearerAdminAuth": []
-        ],
+         "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "admin-controller"
         ],
-        "operationId": "getAllUsers",
+        "operationId": "getUsers",
         "parameters": [
           {
             "name": "page",
@@ -732,7 +898,30 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "type": "array",
+                  "items": {
+                    "$ref":  "#/components/schemas/UserResponse"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request",
+            "content": {
+               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -742,13 +931,13 @@
     },
     "/api/admin/users/{username}": {
       "get": {
-        "security": [
-          "BearerAdminAuth": []
-        ],
+         "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "admin-controller"
         ],
-        "operationId": "getUserById",
+        "operationId": "getUserByUsername",
         "parameters": [
           {
             "name": "username",
@@ -765,7 +954,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref": "#/components/schemas/UserResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request",
+            "content": {
+               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -773,9 +982,9 @@
         }
       },
       "delete": {
-        "security": [
-          "BearerAdminAuth": []
-        ],
+         "security": [{
+          "BearerUserAuth": []  
+        }],
         "tags": [
           "admin-controller"
         ],
@@ -796,7 +1005,27 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "object"
+                  "$ref":  "#/components/schemas/MessageResponseSuccess"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error: Bad Request",
+            "content": {
+               "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseNotFound"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error: Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
                 }
               }
             }
@@ -916,6 +1145,20 @@
           }
         }
       },
+      "UserResponse": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
       "SignupRequest": {
         "required": [
           "email",
@@ -942,9 +1185,7 @@
               "type": "string"
             },
             "uniqueItems": true,
-            "example": [
-              "user"
-            ]
+            "example": ["user"]
           },
           "password": {
             "maxLength": 40,
@@ -971,12 +1212,69 @@
           }
         }
       },
+      "LoginResponse":{
+        "type": "object",
+        "properties": {
+          "token": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "MessageResponseSuccess": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string",
+            "example": "Successfully!"
+          }
+        }
+      },
       "MessageResponseNotFound": {
         "type": "object",
         "properties": {
           "message": {
             "type": "string",
             "example": "{resource} not found"
+          }
+        }
+      },
+      "MessageResponseUnauthorized": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "example": "2021-10-08T16:51:45.636+00:00"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "example": 401
+          },
+          "error": {
+            "type": "string",
+            "example": "Unauthorized"
+          },
+          "path": {
+            "type": "string",
+            "example": "/api/videos/1"
           }
         }
       }
