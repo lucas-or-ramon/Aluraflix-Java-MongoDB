@@ -732,7 +732,7 @@
     "/api/admin/signup": {
       "post": {
          "security": [{
-          "BearerUserAuth": []  
+          "BearerAdminAuth": []  
         }],
         "tags": [
           "admin-controller"
@@ -875,7 +875,7 @@
     "/api/admin/users": {
       "get": {
          "security": [{
-          "BearerUserAuth": []  
+          "BearerAdminAuth": []  
         }],
         "tags": [
           "admin-controller"
@@ -932,7 +932,7 @@
     "/api/admin/users/{username}": {
       "get": {
          "security": [{
-          "BearerUserAuth": []  
+          "BearerAdminAuth": []  
         }],
         "tags": [
           "admin-controller"
@@ -983,7 +983,7 @@
       },
       "delete": {
          "security": [{
-          "BearerUserAuth": []  
+          "BearerAdminAuth": []  
         }],
         "tags": [
           "admin-controller"
