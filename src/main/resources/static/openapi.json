@@ -637,7 +637,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignupRequestAdmin"
+                "$ref": "#/components/schemas/SignupRequest"
               }
             }
           },
@@ -1052,10 +1052,7 @@
             "type": "string"
           },
           "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string"
           }
         }
       },
@@ -1078,50 +1075,6 @@
             "minLength": 0,
             "type": "string",
             "example": "theflash@email.com"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "uniqueItems": true,
-            "example": ["user"]
-          },
-          "password": {
-            "maxLength": 40,
-            "minLength": 6,
-            "type": "string",
-            "example": "123456789"
-          }
-        }
-      },
-      "SignupRequestAdmin": {
-        "required": [
-          "email",
-          "password",
-          "username"
-        ],
-        "type": "object",
-        "properties": {
-          "username": {
-            "maxLength": 20,
-            "minLength": 3,
-            "type": "string",
-            "example": "TheFlash"
-          },
-          "email": {
-            "maxLength": 50,
-            "minLength": 0,
-            "type": "string",
-            "example": "theflash@email.com"
-          },
-          "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            },
-            "uniqueItems": true,
-            "example": ["admin"]
           },
           "password": {
             "maxLength": 40,
@@ -1167,10 +1120,7 @@
             "type": "string"
           },
           "roles": {
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
+            "type": "string"
           }
         }
       },

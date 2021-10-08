@@ -23,14 +23,14 @@ public class JwtResponse {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("roles")
-    private List<String> roles;
+    @JsonProperty("role")
+    private String role;
 
-    public JwtResponse(String token, String id, String username, String email, List<String> roles) {
+    public JwtResponse(String token, String id, String username, String email, String role) {
         this.token = token;
         this.id = id;
         this.username = username;
         this.email = email;
-        this.roles = roles;
+        this.role = role;
     }
 }

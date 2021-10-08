@@ -55,20 +55,9 @@ public class AdminController {
 
         User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), passwordEncoder.encode(signupRequest.getPassword()));
 
-        Set<String> strRoles = signupRequest.getRoles();
         Set<Role> roles = new HashSet<>();
-
-        if (strRoles == null) {
-            Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-            roles.add(userRole);
-        } else {
-            strRoles.forEach(role -> {
-                if ("admin".equals(role)) {
-                    Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-                    roles.add(adminRole);
-                }
-            });
-        }
+        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+        roles.add(adminRole);
 
         user.setRoles(roles);
         userRepository.save(user);

@@ -21,9 +21,6 @@ public class SignupRequest {
     @JsonProperty("email")
     private String email;
 
-    @JsonProperty("roles")
-    private Set<String> roles;
-
     @NotBlank
     @Size(min = 6, max = 40)
     @JsonProperty("password")

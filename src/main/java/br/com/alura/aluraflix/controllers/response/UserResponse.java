@@ -17,12 +17,15 @@ public class UserResponse {
     @JsonProperty("username")
     private String username;
 
-    @JsonProperty("roles")
-    private Set<ERole> roles;
+    @JsonProperty("role")
+    private String role;
 
     private UserResponse(User user) {
         this.username = user.getUsername();
-        this.roles = user.getRoles().stream().map(Role::getName).collect(Collectors.toSet());
+        user.getRoles().stream().map(Role::getName).findFirst().ifPresent(
+                rol -> {
+                    this.role = rol.name();
+                });
     }
 
     public static UserResponse from(User user) {
