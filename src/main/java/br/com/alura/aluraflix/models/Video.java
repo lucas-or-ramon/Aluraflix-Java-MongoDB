@@ -18,6 +18,7 @@ public class Video {
     private String title;
     private String description;
     private String link;
+    private String user;
 
     public Video() {}
 

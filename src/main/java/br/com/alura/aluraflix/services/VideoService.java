@@ -21,13 +21,14 @@ public class VideoService implements VideoRepository {
     MongoTemplate mongoTemplate;
 
     @Override
-    public Page<Video> findVideos(Pageable pageable, String search) {
+    public Page<Video> findVideos(Pageable pageable, String search, String username) {
         try {
             if (search == null) {
-                Query query = new Query().with(pageable);
+                Query query = getQueryWithUserCriteria(username);
                 return getPageVideo(query, pageable);
             }
-            Query query = new Query().addCriteria(Criteria.where("title").regex(search, "i")).with(pageable);
+
+            Query query = getQueryForSearch(search, pageable, username);
             return getPageVideo(query, pageable);
         } catch (Exception e) {
             return Page.empty();
@@ -35,18 +36,28 @@ public class VideoService implements VideoRepository {
     }
 
     @Override
-    public Optional<Video> findVideoById(final Integer id) {
+    public Page<Video> findFreeVideos(Pageable pageable, Integer categoryId) {
         try {
-            return Optional.ofNullable(mongoTemplate.findOne(getQueryById(id), Video.class));
+            Query query = new Query().addCriteria(Criteria.where("categoryId").is(categoryId));
+            return getPageVideo(query, pageable);
+        } catch (Exception e) {
+            return Page.empty();
+        }
+    }
+
+    @Override
+    public Optional<Video> findVideoById(final Integer id, String username) {
+        try {
+            return Optional.ofNullable(mongoTemplate.findOne(getQueryById(id, username), Video.class));
         } catch (Exception e) {
             return Optional.empty();
         }
     }
 
     @Override
-    public Boolean existsById(Integer id) {
+    public Boolean existsById(Integer id, String username) {
         try {
-            return mongoTemplate.exists(getQueryById(id), Video.class);
+            return mongoTemplate.exists(getQueryById(id,username), Video.class);
         } catch (Exception e) {
             return false;
         }
@@ -63,9 +74,9 @@ public class VideoService implements VideoRepository {
     }
 
     @Override
-    public Boolean deleteVideo(final Integer id) {
+    public Boolean deleteVideo(final Integer id, String username) {
         try {
-            mongoTemplate.remove(getQueryById(id), Video.class);
+            mongoTemplate.remove(getQueryById(id, username), Video.class);
             return true;
         } catch (Exception e) {
             return false;
@@ -73,22 +84,38 @@ public class VideoService implements VideoRepository {
     }
 
     @Override
-    public Page<Video> findVideosByCategory(Pageable pageable, Integer categoryId) {
+    public Page<Video> findVideosByCategory(Pageable pageable, Integer categoryId, String username) {
         try {
-            Query query = new Query().addCriteria(Criteria.where("categoryId").is(categoryId)).with(pageable);
+            Query query = getQueryWithUserCriteria(username);
+            query.addCriteria(Criteria.where("categoryId").is(categoryId)).with(pageable);
             return getPageVideo(query, pageable);
         } catch (Exception e) {
             return Page.empty();
         }
     }
 
-    public Query getQueryById(Integer id) {
-        return Query.query(Criteria.where("id").is(id));
+    public Query getQueryById(Integer id, String username) {
+        Query query = getQueryWithUserCriteria(username);
+        return query.addCriteria(Criteria.where("id").is(id));
     }
 
     public Page<Video> getPageVideo(Query query, Pageable pageable) {
         List<Video> videoList = mongoTemplate.find(query, Video.class);
         long count = mongoTemplate.count(query.skip(-1).limit(-1), Video.class);
         return new PageImpl<>(videoList, pageable, count);
+    }
+
+    public Query getQueryWithUserCriteria(String username) {
+        return Query.query(Criteria.where("user").is(username));
+    }
+
+    public Query getQueryForSearch(String search, Pageable pageable, String username) {
+        Query query = getQueryWithUserCriteria(username);
+
+        Criteria criteria1 = Criteria.where("title").regex(search, "i");
+        Criteria criteria2 = Criteria.where("description").regex(search, "i");
+
+        query.addCriteria(new Criteria().orOperator(criteria1, criteria2)).with(pageable);
+        return query;
     }
 }

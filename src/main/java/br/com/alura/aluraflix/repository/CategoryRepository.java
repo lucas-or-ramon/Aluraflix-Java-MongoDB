@@ -8,9 +8,9 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CategoryRepository {
-    Page<Category> findCategories(Pageable pageable);
-    Optional<Category> findCategoryById(Integer id);
+    Page<Category> findCategories(Pageable pageable, String username);
+    Optional<Category> findCategoryById(Integer id, String username);
     Boolean insertOrUpdateCategory(Category category);
-    Boolean deleteCategory(Integer id);
-    Boolean existsById(Integer id);
+    Boolean deleteCategory(Integer id, String username);
+    Boolean existsById(Integer id, String username);
 }

@@ -8,6 +8,7 @@ import br.com.alura.aluraflix.models.Category;
 import br.com.alura.aluraflix.models.Video;
 import br.com.alura.aluraflix.repository.CategoryRepository;
 import br.com.alura.aluraflix.repository.VideoRepository;
+import br.com.alura.aluraflix.security.jwt.JwtUtils;
 import br.com.alura.aluraflix.services.NextSequenceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -30,6 +31,9 @@ import java.util.stream.Collectors;
 public class CategoryController {
 
     @Autowired
+    JwtUtils jwtUtils;
+
+    @Autowired
     VideoRepository videoRepository;
 
     @Autowired
@@ -39,11 +43,12 @@ public class CategoryController {
     NextSequenceService nextSequenceService;
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getCategories(@RequestParam int page) {
+    public ResponseEntity<?> getCategories(@RequestHeader("Authorization") String headerAuth, @RequestParam int page) {
+
+        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
 
         Pageable pageable = PageRequest.of(page, Category.PAGE_LIMIT);
-
-        Page<Category> categoryPage = categoryRepository.findCategories(pageable);
+        Page<Category> categoryPage = categoryRepository.findCategories(pageable, username);
 
         if (categoryPage.isEmpty()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Categories not found"));
@@ -55,8 +60,10 @@ public class CategoryController {
             value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getCategoryById(@PathVariable Integer id) {
-        Optional<Category> optionalCategory = categoryRepository.findCategoryById(id);
+    public ResponseEntity<?> getCategoryById(@RequestHeader("Authorization") String headerAuth,
+                                             @PathVariable Integer id) {
+        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
+        Optional<Category> optionalCategory = categoryRepository.findCategoryById(id, username);
 
         if (optionalCategory.isPresent()) {
             return ResponseEntity.ok(CategoryResponse.from(optionalCategory.get()));
@@ -68,22 +75,18 @@ public class CategoryController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> insertCategory(@Valid @RequestBody final CategoryRequest categoryRequest) {
+    public ResponseEntity<?> insertCategory(@RequestHeader("Authorization") String headerAuth,
+                                            @Valid @RequestBody final CategoryRequest categoryRequest) {
+        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
+
         Category category = Category.from(categoryRequest);
         category.setId(nextSequenceService.getNextSequence(Category.SEQUENCE_NAME));
+        category.setUser(username);
+
         if (categoryRepository.insertOrUpdateCategory(category)) {
             return ResponseEntity.ok(CategoryResponse.from(category));
         }
         return ResponseEntity.badRequest().body(new MessageResponse("Category not inserted"));
-    }
-
-    @PostMapping(
-            value = "/many",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public List<ResponseEntity<?>> insertManyCategories(@Valid @RequestBody final List<CategoryRequest> categoryRequests) {
-        return categoryRequests.stream().map(this::insertCategory).collect(Collectors.toList());
     }
 
     @PutMapping(
@@ -91,8 +94,13 @@ public class CategoryController {
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> updateCategory(@PathVariable Integer id, @Valid @RequestBody final CategoryRequest categoryRequest) {
-        if (categoryRepository.existsById(id)) {
+    public ResponseEntity<?> updateCategory(@RequestHeader("Authorization") String headerAuth,
+                                            @PathVariable Integer id,
+                                            @Valid @RequestBody final CategoryRequest categoryRequest) {
+
+        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
+
+        if (categoryRepository.existsById(id, username)) {
             Category category = Category.from(categoryRequest);
             category.setId(id);
 
@@ -109,9 +117,13 @@ public class CategoryController {
             value = "/{id}",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> deleteCategory(@PathVariable Integer id) {
-        if (categoryRepository.existsById(id)) {
-            if (categoryRepository.deleteCategory(id)) {
+    public ResponseEntity<?> deleteCategory(@RequestHeader("Authorization") String headerAuth,
+                                            @PathVariable Integer id) {
+
+        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
+
+        if (categoryRepository.existsById(id, username)) {
+            if (categoryRepository.deleteCategory(id, username)) {
                 return ResponseEntity.ok(new MessageResponse("Deleted category"));
             }
             return ResponseEntity.internalServerError().build();
@@ -124,12 +136,15 @@ public class CategoryController {
             value = "/{categoryId}/videos",
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    public ResponseEntity<?> getVideosByCategory(@PathVariable Integer categoryId, @RequestParam int page) {
+    public ResponseEntity<?> getVideosByCategory(@RequestHeader("Authorization") String headerAuth,
+                                                 @PathVariable Integer categoryId, @RequestParam int page) {
 
-        if (categoryRepository.existsById(categoryId)) {
+        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
+
+        if (categoryRepository.existsById(categoryId, username)) {
             Pageable pageable = PageRequest.of(page, Video.PAGE_LIMIT);
 
-            Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, categoryId);
+            Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, categoryId, username);
 
             if (videoPage.isEmpty()) {
                 return ResponseEntity.badRequest().body(new MessageResponse("Videos not found"));

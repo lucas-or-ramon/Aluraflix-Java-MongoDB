@@ -13,6 +13,7 @@
   "paths": {
     "/api/videos/{id}": {
       "get": {
+        "description": "Get Video By ID",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -65,6 +66,7 @@
         }
       },
       "put": {
+        "description": "Update Video By ID",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -127,6 +129,7 @@
         }
       },
       "delete": {
+        "description": "Delete Video By ID",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -181,6 +184,7 @@
     },
     "/api/categories/{id}": {
       "get": {
+        "description": "Get Category By ID",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -233,6 +237,7 @@
         }
       },
       "put": {
+        "description": "Update Category By ID",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -295,6 +300,7 @@
         }
       },
       "delete": {
+        "description": "Delete Category By ID",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -349,6 +355,7 @@
     },
     "/start/signup": {
       "post": {
+        "description": "Register New User",
         "tags": [
           "public-controller"
         ],
@@ -379,6 +386,7 @@
     },
     "/start/signin": {
       "post": {
+        "description": "Login User",
         "tags": [
           "public-controller"
         ],
@@ -407,28 +415,9 @@
         }
       }
     },
-    "/start/logout": {
-      "post": {
-        "tags": [
-          "public-controller"
-        ],
-        "operationId": "logoutUser",
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "*/*": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseSuccess"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/videos": {
       "get": {
+        "description": "Get All Videos or Search For a Video",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -492,6 +481,7 @@
         }
       },
       "post": {
+        "description": "Insert New Video",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -533,57 +523,9 @@
         }
       }
     },
-    "/api/videos/many": {
-      "post": {
-        "security": [{
-          "BearerUserAuth": []  
-        }],
-        "tags": [
-          "video-controller"
-        ],
-        "operationId": "insertManyVideos",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/VideoRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error: Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/categories": {
       "get": {
+        "description": "Get All Categories",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -639,6 +581,7 @@
         }
       },
       "post": {
+        "description": "Insert New Category",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -680,58 +623,10 @@
         }
       }
     },
-    "/api/categories/many": {
-      "post": {
-        "security": [{
-          "BearerUserAuth": []  
-        }],
-        "tags": [
-          "category-controller"
-        ],
-        "operationId": "insertManyCategories",
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/CategoryRequest"
-                }
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "type": "object"
-                  }
-                }
-              }
-            }
-          },
-          "401": {
-            "description": "Error: Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/MessageResponseUnauthorized"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/admin/signup": {
       "post": {
-         "security": [{
+        "description": "Register New Administrator User",
+        "security": [{
           "BearerAdminAuth": []  
         }],
         "tags": [
@@ -742,7 +637,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/SignupRequest"
+                "$ref": "#/components/schemas/SignupRequestAdmin"
               }
             }
           },
@@ -774,6 +669,7 @@
     },
     "/start/free": {
       "get": {
+        "description": "Get All Free Videos",
         "tags": [
           "public-controller"
         ],
@@ -808,6 +704,7 @@
     },
     "/api/categories/{categoryId}/videos": {
       "get": {
+        "description": "Get All Videos By Category",
         "security": [{
           "BearerUserAuth": []  
         }],
@@ -874,7 +771,8 @@
     },
     "/api/admin/users": {
       "get": {
-         "security": [{
+        "description": "Get All Users",
+        "security": [{
           "BearerAdminAuth": []  
         }],
         "tags": [
@@ -931,7 +829,8 @@
     },
     "/api/admin/users/{username}": {
       "get": {
-         "security": [{
+        "description": "Get User By Username",
+        "security": [{
           "BearerAdminAuth": []  
         }],
         "tags": [
@@ -982,7 +881,8 @@
         }
       },
       "delete": {
-         "security": [{
+        "description": "Delete User By Username",
+        "security": [{
           "BearerAdminAuth": []  
         }],
         "tags": [
@@ -1186,6 +1086,42 @@
             },
             "uniqueItems": true,
             "example": ["user"]
+          },
+          "password": {
+            "maxLength": 40,
+            "minLength": 6,
+            "type": "string",
+            "example": "123456789"
+          }
+        }
+      },
+      "SignupRequestAdmin": {
+        "required": [
+          "email",
+          "password",
+          "username"
+        ],
+        "type": "object",
+        "properties": {
+          "username": {
+            "maxLength": 20,
+            "minLength": 3,
+            "type": "string",
+            "example": "TheFlash"
+          },
+          "email": {
+            "maxLength": 50,
+            "minLength": 0,
+            "type": "string",
+            "example": "theflash@email.com"
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "uniqueItems": true,
+            "example": ["admin"]
           },
           "password": {
             "maxLength": 40,

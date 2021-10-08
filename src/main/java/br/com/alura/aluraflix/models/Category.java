@@ -16,6 +16,7 @@ public class Category {
     private Integer id;
     private String title;
     private String color;
+    private String user;
 
     public Category() {
     }

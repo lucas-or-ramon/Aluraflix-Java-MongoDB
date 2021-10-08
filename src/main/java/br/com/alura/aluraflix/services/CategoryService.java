@@ -21,9 +21,9 @@ public class CategoryService implements CategoryRepository {
     MongoTemplate mongoTemplate;
 
     @Override
-    public Page<Category> findCategories(Pageable pageable) {
+    public Page<Category> findCategories(Pageable pageable, String username) {
         try {
-            Query query = new Query().with(pageable);
+            Query query = getQueryWithUserCriteria(username).with(pageable);
             List<Category> categoryPage = mongoTemplate.find(query, Category.class);
             long count = mongoTemplate.count(query.skip(-1).limit(-1), Category.class);
             return new PageImpl<>(categoryPage, pageable, count);
@@ -33,9 +33,9 @@ public class CategoryService implements CategoryRepository {
     }
 
     @Override
-    public Optional<Category> findCategoryById(Integer id) {
+    public Optional<Category> findCategoryById(Integer id, String username) {
         try {
-            return Optional.ofNullable(mongoTemplate.findOne(getQueryById(id), Category.class));
+            return Optional.ofNullable(mongoTemplate.findOne(getQueryById(id, username), Category.class));
         } catch (Exception e) {
             return Optional.empty();
         }
@@ -52,9 +52,9 @@ public class CategoryService implements CategoryRepository {
     }
 
     @Override
-    public Boolean deleteCategory(Integer id) {
+    public Boolean deleteCategory(Integer id, String username) {
         try {
-            mongoTemplate.remove(getQueryById(id), Category.class);
+            mongoTemplate.remove(getQueryById(id, username), Category.class);
             return true;
         } catch (Exception e) {
             return false;
@@ -62,15 +62,20 @@ public class CategoryService implements CategoryRepository {
     }
 
     @Override
-    public Boolean existsById(Integer id) {
+    public Boolean existsById(Integer id, String username) {
         try {
-            return mongoTemplate.exists(getQueryById(id), Category.class);
+            return mongoTemplate.exists(getQueryById(id, username), Category.class);
         } catch (Exception e) {
             return false;
         }
     }
 
-    public Query getQueryById(Integer id) {
-        return Query.query(Criteria.where("id").is(id));
+    public Query getQueryById(Integer id, String username) {
+        Query query = getQueryWithUserCriteria(username);
+        return query.addCriteria(Criteria.where("id").is(id));
+    }
+
+    public Query getQueryWithUserCriteria(String username) {
+        return Query.query(Criteria.where("user").is(username));
     }
 }
