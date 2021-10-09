@@ -24,7 +24,7 @@ public class VideoService implements VideoRepository {
     public Page<Video> findVideos(Pageable pageable, String search, String username) {
         try {
             if (search == null) {
-                Query query = getQueryWithUserCriteria(username);
+                Query query = getQueryWithUserCriteria(username).with(pageable);
                 return getPageVideo(query, pageable);
             }
 

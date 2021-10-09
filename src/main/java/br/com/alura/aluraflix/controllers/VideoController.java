@@ -24,7 +24,7 @@ import java.util.Optional;
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
 @RequestMapping("/api/videos")
-@PreAuthorize("hasRole('USER') or hasRole('MODERATOR')")
+@PreAuthorize("hasRole('USER')")
 public class VideoController {
 
     @Autowired
