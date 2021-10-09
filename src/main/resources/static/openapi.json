@@ -1020,7 +1020,7 @@
             "format": "int32"
           },
           "title": {
-            "maxLength": 50,
+            "maxLength": 80,
             "minLength": 0,
             "type": "string"
           },

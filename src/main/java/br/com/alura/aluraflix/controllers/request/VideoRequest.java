@@ -11,7 +11,7 @@ import javax.validation.constraints.Size;
 public class VideoRequest {
 
     @NotBlank
-    @Size(max = 50)
+    @Size(max = 80)
     @JsonProperty("title")
     private String title;
 
