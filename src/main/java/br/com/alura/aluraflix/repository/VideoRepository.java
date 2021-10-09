@@ -8,10 +8,16 @@ import java.util.Optional;
 
 public interface VideoRepository {
     Page<Video> findVideosByCategory(Pageable pageable, Integer categoryId, String username);
+
     Page<Video> findVideos(Pageable pageable, String search, String username);
+
     Page<Video> findFreeVideos(Pageable pageable, Integer freeCategory);
+
     Optional<Video> findVideoById(Integer id, String username);
+
     Boolean insertOrUpdateVideo(Video video);
+
     Boolean deleteVideo(Integer id, String username);
+
     Boolean existsById(Integer id, String username);
 }

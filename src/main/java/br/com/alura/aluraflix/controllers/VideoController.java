@@ -41,8 +41,8 @@ public class VideoController {
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getVideos(@RequestHeader("Authorization") String headerAuth,
-            @RequestParam(required = false) String search,
-            @RequestParam int page) {
+                                       @RequestParam(required = false) String search,
+                                       @RequestParam int page) {
 
         String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
 

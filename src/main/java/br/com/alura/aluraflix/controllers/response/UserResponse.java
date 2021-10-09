@@ -1,14 +1,11 @@
 package br.com.alura.aluraflix.controllers.response;
 
-import br.com.alura.aluraflix.models.ERole;
 import br.com.alura.aluraflix.models.Role;
 import br.com.alura.aluraflix.models.User;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 
 @Data

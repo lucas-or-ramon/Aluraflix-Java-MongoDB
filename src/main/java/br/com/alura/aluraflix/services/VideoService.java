@@ -57,7 +57,7 @@ public class VideoService implements VideoRepository {
     @Override
     public Boolean existsById(Integer id, String username) {
         try {
-            return mongoTemplate.exists(getQueryById(id,username), Video.class);
+            return mongoTemplate.exists(getQueryById(id, username), Video.class);
         } catch (Exception e) {
             return false;
         }

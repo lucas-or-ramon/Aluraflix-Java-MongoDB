@@ -25,7 +25,7 @@ public class CategoryResponse {
         this.color = category.getColor();
     }
 
-    public static CategoryResponse from(final Category category){
+    public static CategoryResponse from(final Category category) {
         return new CategoryResponse(category);
     }
 

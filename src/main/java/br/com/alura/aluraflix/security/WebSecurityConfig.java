@@ -54,10 +54,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        final String[] WHITELIST = {
+                "/start/**",
+                "/v3/api-docs/swagger-config",
+                "/swagger-ui/**",
+                "/openapi.json"
+        };
+
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers("/start/**", "/**").permitAll()
+                .authorizeRequests().antMatchers(WHITELIST).permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated();
 

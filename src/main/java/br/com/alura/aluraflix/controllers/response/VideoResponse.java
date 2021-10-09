@@ -4,7 +4,6 @@ import br.com.alura.aluraflix.models.Video;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +33,7 @@ public class VideoResponse {
         this.categoryId = video.getCategoryId();
     }
 
-    public static VideoResponse from(final Video video){
+    public static VideoResponse from(final Video video) {
         return new VideoResponse(video);
     }
 
