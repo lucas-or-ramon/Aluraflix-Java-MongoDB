@@ -21,10 +21,9 @@ Repositório sobre o proteto do Challenge Alura Back End em Java com MongoDB
         - **Project SDK**: JDK 11
 - Edit configurations..
     - '+' Add new configuration >> **Application**
-        - **Name (Example)**: Aluraflix
         - **VM options**
             ```
             -Dspring.profiles.active=dev
-            -Dmongodb_uri=
+            -Dmongodb_uri=mongodb://SUA_URI_DO_MONGO
             ```
 
