@@ -27,12 +27,14 @@ public class Category {
         this.color = color;
     }
 
-    private Category(CategoryRequest categoryRequest) {
+    private Category(Integer id, String user, CategoryRequest categoryRequest) {
+        this.id = id;
+        this.user = user;
         this.title = categoryRequest.getTitle();
         this.color = categoryRequest.getColor();
     }
 
-    public static Category from(final CategoryRequest categoryRequest) {
-        return new Category(categoryRequest);
+    public static Category from(Integer id, String user, CategoryRequest categoryRequest) {
+        return new Category(id, user, categoryRequest);
     }
 }

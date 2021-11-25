@@ -22,10 +22,10 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Optional;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping(value = "/api/categories")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @PreAuthorize("hasRole('USER') or hasRole('MODERATOR')")
+@RequestMapping(value = "/api/categories")
 public class CategoryController {
 
     @Autowired
@@ -43,113 +43,90 @@ public class CategoryController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getCategories(@RequestHeader("Authorization") String headerAuth, @RequestParam int page) {
 
-        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
-
         Pageable pageable = PageRequest.of(page, Category.PAGE_LIMIT);
-        Page<Category> categoryPage = categoryRepository.findCategories(pageable, username);
+        Page<Category> categoryPage = categoryRepository.findCategories(pageable, getUsername(headerAuth));
 
-        if (categoryPage.isEmpty()) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Categories not found"));
-        }
-        return ResponseEntity.ok(CategoryResponse.fromList(categoryPage.toList()));
+        return categoryPage.isEmpty() ? categoryNotFound()
+                : ResponseEntity.ok(CategoryResponse.fromList(categoryPage.toList()));
     }
 
-    @GetMapping(
-            value = "/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    private String getUsername(String headerAuth) {
+        return jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
+    }
+
+    private ResponseEntity<MessageResponse> categoryNotFound() {
+        return ResponseEntity.badRequest().body(new MessageResponse("Categoriy not found"));
+    }
+
+    @GetMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getCategoryById(@RequestHeader("Authorization") String headerAuth,
-                                             @PathVariable Integer id) {
-        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
-        Optional<Category> optionalCategory = categoryRepository.findCategoryById(id, username);
+            @PathVariable Integer id) {
 
-        if (optionalCategory.isPresent()) {
-            return ResponseEntity.ok(CategoryResponse.from(optionalCategory.get()));
-        }
-        return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
+        Optional<Category> optionalCategory = categoryRepository.findCategoryById(id, getUsername(headerAuth));
+
+        return optionalCategory.isPresent() ? okFrom(optionalCategory.get()) : categoryNotFound();
     }
 
-    @PostMapping(
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    private ResponseEntity<?> okFrom(Category category) {
+        return ResponseEntity.ok(CategoryResponse.from(category));
+    }
+
+    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> insertCategory(@RequestHeader("Authorization") String headerAuth,
-                                            @Valid @RequestBody final CategoryRequest categoryRequest) {
-        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
+            @Valid @RequestBody final CategoryRequest categoryRequest) {
 
-        Category category = Category.from(categoryRequest);
-        category.setId(nextSequenceService.getNextSequence(Category.SEQUENCE_NAME));
-        category.setUser(username);
+        int id = nextSequenceService.getNextSequence(Category.SEQUENCE_NAME);
+        Category category = Category.from(id, getUsername(headerAuth), categoryRequest);
 
-        if (categoryRepository.insertOrUpdateCategory(category)) {
-            return ResponseEntity.ok(CategoryResponse.from(category));
-        }
-        return ResponseEntity.badRequest().body(new MessageResponse("Category not inserted"));
+        boolean updated = categoryRepository.insertOrUpdateCategory(category);
+
+        return updated ? okFrom(category)
+                : ResponseEntity.badRequest().body(new MessageResponse("Category not inserted"));
     }
 
-    @PutMapping(
-            value = "/{id}",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<?> updateCategory(@RequestHeader("Authorization") String headerAuth,
-                                            @PathVariable Integer id,
-                                            @Valid @RequestBody final CategoryRequest categoryRequest) {
+    @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> updateCategory(@RequestHeader("Authorization") String headerAuth, @PathVariable Integer id,
+            @Valid @RequestBody final CategoryRequest categoryRequest) {
 
-        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
-
+        String username = getUsername(headerAuth);
         if (categoryRepository.existsById(id, username)) {
-            Category category = Category.from(categoryRequest);
-            category.setId(id);
+            Category category = Category.from(id, username, categoryRequest);
 
-            if (categoryRepository.insertOrUpdateCategory(category)) {
-                return ResponseEntity.ok(CategoryResponse.from(category));
-            }
-            return ResponseEntity.badRequest().body(new MessageResponse("Category not updated"));
-        } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
+            boolean updated = categoryRepository.insertOrUpdateCategory(category);
+
+            return updated ? okFrom(category)
+                    : ResponseEntity.badRequest().body(new MessageResponse("Category not updated"));
         }
+        return categoryNotFound();
     }
 
-    @DeleteMapping(
-            value = "/{id}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @DeleteMapping(value = "/{id}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteCategory(@RequestHeader("Authorization") String headerAuth,
-                                            @PathVariable Integer id) {
+            @PathVariable Integer id) {
 
-        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
-
+        String username = getUsername(headerAuth);
         if (categoryRepository.existsById(id, username)) {
-            if (categoryRepository.deleteCategory(id, username)) {
-                return ResponseEntity.ok(new MessageResponse("Deleted category"));
-            }
-            return ResponseEntity.internalServerError().build();
-        } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
+            boolean deleted = categoryRepository.deleteCategory(id, username);
+
+            return deleted ? ResponseEntity.ok(new MessageResponse("Deleted category"))
+                    : ResponseEntity.internalServerError().build();
         }
+        return categoryNotFound();
     }
 
-    @GetMapping(
-            value = "/{categoryId}/videos",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/{categoryId}/videos", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getVideosByCategory(@RequestHeader("Authorization") String headerAuth,
-                                                 @PathVariable Integer categoryId, @RequestParam int page) {
+            @PathVariable Integer categoryId, @RequestParam int page) {
 
-        String username = jwtUtils.getUserNameFromJwtToken(headerAuth.substring(7));
-
+        String username = getUsername(headerAuth);
         if (categoryRepository.existsById(categoryId, username)) {
-            Pageable pageable = PageRequest.of(page, Video.PAGE_LIMIT);
 
+            Pageable pageable = PageRequest.of(page, Video.PAGE_LIMIT);
             Page<Video> videoPage = videoRepository.findVideosByCategory(pageable, categoryId, username);
 
-            if (videoPage.isEmpty()) {
-                return ResponseEntity.badRequest().body(new MessageResponse("Videos not found"));
-            }
-            return ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
-        } else {
-            return ResponseEntity.badRequest().body(new MessageResponse("Category not found"));
+            return videoPage.isEmpty() ? ResponseEntity.badRequest().body(new MessageResponse("Videos not found"))
+                    : ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
         }
+        return categoryNotFound();
     }
 }

@@ -31,14 +31,16 @@ public class Video {
         this.link = link;
     }
 
-    private Video(final VideoRequest videoRequest) {
-        this.title = videoRequest.getTitle();
-        this.description = videoRequest.getDescription();
+    private Video(Integer id, String user, VideoRequest videoRequest) {
+        this.id = id;
+        this.user = user;
         this.link = videoRequest.getLink();
+        this.title = videoRequest.getTitle();
         this.categoryId = videoRequest.getCategoryId();
+        this.description = videoRequest.getDescription();
     }
 
-    public static Video from(final VideoRequest videoRequest) {
-        return new Video(videoRequest);
+    public static Video from(Integer id, String user, VideoRequest videoRequest) {
+        return new Video(id, user, videoRequest);
     }
 }

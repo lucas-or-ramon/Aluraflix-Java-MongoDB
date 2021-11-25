@@ -15,9 +15,9 @@ public interface VideoRepository {
 
     Optional<Video> findVideoById(Integer id, String username);
 
-    Boolean insertOrUpdateVideo(Video video);
+    boolean insertOrUpdateVideo(Video video);
 
-    Boolean deleteVideo(Integer id, String username);
+    boolean deleteVideo(Integer id, String username);
 
-    Boolean existsById(Integer id, String username);
+    boolean existsById(Integer id, String username);
 }

@@ -12,6 +12,7 @@ import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 @Service
@@ -23,7 +24,7 @@ public class VideoService implements VideoRepository {
     @Override
     public Page<Video> findVideos(Pageable pageable, String search, String username) {
         try {
-            if (search == null) {
+            if (Objects.isNull(search)) {
                 Query query = getQueryWithUserCriteria(username).with(pageable);
                 return getPageVideo(query, pageable);
             }
@@ -55,7 +56,7 @@ public class VideoService implements VideoRepository {
     }
 
     @Override
-    public Boolean existsById(Integer id, String username) {
+    public boolean existsById(Integer id, String username) {
         try {
             return mongoTemplate.exists(getQueryById(id, username), Video.class);
         } catch (Exception e) {
@@ -64,7 +65,7 @@ public class VideoService implements VideoRepository {
     }
 
     @Override
-    public Boolean insertOrUpdateVideo(final Video video) {
+    public boolean insertOrUpdateVideo(final Video video) {
         try {
             mongoTemplate.save(video);
             return true;
@@ -74,7 +75,7 @@ public class VideoService implements VideoRepository {
     }
 
     @Override
-    public Boolean deleteVideo(final Integer id, String username) {
+    public boolean deleteVideo(final Integer id, String username) {
         try {
             mongoTemplate.remove(getQueryById(id, username), Video.class);
             return true;

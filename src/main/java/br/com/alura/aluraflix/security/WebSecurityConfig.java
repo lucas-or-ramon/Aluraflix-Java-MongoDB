@@ -54,7 +54,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        final String[] WHITELIST = {
+        final String[] whiteList = {
                 "/start/**",
                 "/v3/api-docs/swagger-config",
                 "/swagger-ui/**",
@@ -64,7 +64,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         http.cors().and().csrf().disable()
                 .exceptionHandling().authenticationEntryPoint(unauthorizedHandler).and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
-                .authorizeRequests().antMatchers(WHITELIST).permitAll()
+                .authorizeRequests().antMatchers(whiteList).permitAll()
                 .antMatchers("/api/**").permitAll()
                 .anyRequest().authenticated();
 

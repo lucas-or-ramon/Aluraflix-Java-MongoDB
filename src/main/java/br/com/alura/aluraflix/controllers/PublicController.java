@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,8 +32,8 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
+@CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/start")
 public class PublicController {
 
@@ -54,30 +55,42 @@ public class PublicController {
     @Autowired
     AuthenticationManager authenticationManager;
 
-    @PostMapping(
-            value = "/signin",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PostMapping(value = "/signin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
+        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles.get(0)));
+
+        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
+                userDetails.getEmail(), roles.get(0)));
     }
 
-    @PostMapping(
-            value = "/signup",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
+
+        ResponseEntity<MessageResponse> response = isUsernameAndEmailValid(signupRequest);
+        if (response.getStatusCode().equals(HttpStatus.BAD_REQUEST))
+            return response;
+
+        String password = passwordEncoder.encode(signupRequest.getPassword());
+        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), password);
+
+        Set<Role> roles = new HashSet<>();
+        roles.add(getUserRole());
+
+        user.setRoles(roles);
+        userRepository.save(user);
+
+        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    }
+
+    private ResponseEntity<MessageResponse> isUsernameAndEmailValid(SignupRequest signupRequest) {
         if (userRepository.existsByUsername(signupRequest.getUsername())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
         }
@@ -85,17 +98,12 @@ public class PublicController {
         if (userRepository.existsByEmail(signupRequest.getEmail())) {
             return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
         }
+        return ResponseEntity.ok(new MessageResponse(""));
+    }
 
-        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), passwordEncoder.encode(signupRequest.getPassword()));
-
-        Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName(ERole.ROLE_USER).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-        roles.add(userRole);
-
-        user.setRoles(roles);
-        userRepository.save(user);
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+    private Role getUserRole() {
+        return roleRepository.findByName(ERole.ROLE_USER)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
     }
 
     @PostMapping("/logout")
@@ -104,19 +112,13 @@ public class PublicController {
         return ResponseEntity.ok(new MessageResponse("Logout successful"));
     }
 
-    @GetMapping(
-            value = "/free",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/free", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getFreeVideos(@RequestParam int page) {
 
         Pageable pageable = PageRequest.of(page, User.PAGE_LIMIT);
-
         Page<Video> videoPage = videoRepository.findFreeVideos(pageable, Category.FREE_CATEGORY);
 
-        if (videoPage.isEmpty()) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Videos not found"));
-        }
-        return ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
+        return videoPage.isEmpty() ? ResponseEntity.badRequest().body(new MessageResponse("Videos not found"))
+                : ResponseEntity.ok(VideoResponse.fromList(videoPage.toList()));
     }
 }

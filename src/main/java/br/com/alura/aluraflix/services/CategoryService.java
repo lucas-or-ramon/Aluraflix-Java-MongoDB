@@ -25,6 +25,7 @@ public class CategoryService implements CategoryRepository {
         try {
             Query query = getQueryWithUserCriteria(username).with(pageable);
             List<Category> categoryPage = mongoTemplate.find(query, Category.class);
+            
             long count = mongoTemplate.count(query.skip(-1).limit(-1), Category.class);
             return new PageImpl<>(categoryPage, pageable, count);
         } catch (Exception e) {
@@ -42,7 +43,7 @@ public class CategoryService implements CategoryRepository {
     }
 
     @Override
-    public Boolean insertOrUpdateCategory(final Category category) {
+    public boolean insertOrUpdateCategory(final Category category) {
         try {
             mongoTemplate.save(category);
             return true;
@@ -52,7 +53,7 @@ public class CategoryService implements CategoryRepository {
     }
 
     @Override
-    public Boolean deleteCategory(Integer id, String username) {
+    public boolean deleteCategory(Integer id, String username) {
         try {
             mongoTemplate.remove(getQueryById(id, username), Category.class);
             return true;
@@ -62,7 +63,7 @@ public class CategoryService implements CategoryRepository {
     }
 
     @Override
-    public Boolean existsById(Integer id, String username) {
+    public boolean existsById(Integer id, String username) {
         try {
             return mongoTemplate.exists(getQueryById(id, username), Category.class);
         } catch (Exception e) {

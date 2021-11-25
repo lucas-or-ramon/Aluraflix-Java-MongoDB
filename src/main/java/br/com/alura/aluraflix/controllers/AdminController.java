@@ -8,10 +8,13 @@ import br.com.alura.aluraflix.models.Role;
 import br.com.alura.aluraflix.models.User;
 import br.com.alura.aluraflix.repository.RoleRepository;
 import br.com.alura.aluraflix.repository.UserRepository;
+
+import org.eclipse.jetty.websocket.api.StatusCode;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -23,11 +26,10 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
-
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping(value = "/api/admin")
 @PreAuthorize("hasRole('ADMIN')")
+@RequestMapping(value = "/api/admin")
+@CrossOrigin(origins = "*", maxAge = 3600)
 public class AdminController {
 
     @Autowired
@@ -39,25 +41,19 @@ public class AdminController {
     @Autowired
     PasswordEncoder passwordEncoder;
 
-    @PostMapping(
-            value = "/signup",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<?> registerUserAdmin(@Valid @RequestBody SignupRequest signupRequest) {
-        if (userRepository.existsByUsername(signupRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+    @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<MessageResponse> registerUserAdmin(@Valid @RequestBody SignupRequest signupRequest) {
+
+        ResponseEntity<MessageResponse> response = isUsernameAndEmailValid(signupRequest);
+        if (response.getStatusCode().equals(HttpStatus.BAD_REQUEST)) {
+            return response;
         }
 
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
-        }
-
-        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), passwordEncoder.encode(signupRequest.getPassword()));
+        String password = passwordEncoder.encode(signupRequest.getPassword());
+        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), password);
 
         Set<Role> roles = new HashSet<>();
-        Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN).orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-        roles.add(adminRole);
+        roles.add(getAdminRole());
 
         user.setRoles(roles);
         userRepository.save(user);
@@ -65,15 +61,27 @@ public class AdminController {
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
     }
 
-    @GetMapping(
-            value = "/users",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
-    public ResponseEntity<?> GetUsers(@RequestParam int page) {
+    private ResponseEntity<MessageResponse> isUsernameAndEmailValid(SignupRequest signupRequest) {
+        if (Boolean.TRUE.equals(userRepository.existsByUsername(signupRequest.getUsername()))) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
+        }
 
-        Pageable pageable = PageRequest.of(page, User.PAGE_LIMIT);
+        if (Boolean.TRUE.equals(userRepository.existsByEmail(signupRequest.getEmail()))) {
+            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
+        }
 
-        Page<User> userPage = userRepository.findAll(pageable);
+        return ResponseEntity.ok().body(new MessageResponse(""));
+    }
+
+    private Role getAdminRole() {
+        return roleRepository.findByName(ERole.ROLE_ADMIN)
+                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
+    }
+
+    @GetMapping(value = "/users", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> getUsers(@RequestParam int page) {
+
+        Page<User> userPage = userRepository.findAll(PageRequest.of(page, User.PAGE_LIMIT));
 
         if (userPage.isEmpty()) {
             return ResponseEntity.badRequest().body(new MessageResponse("Users not found"));
@@ -81,10 +89,7 @@ public class AdminController {
         return ResponseEntity.ok(UserResponse.fromList(userPage.toList()));
     }
 
-    @GetMapping(
-            value = "/users/{username}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @GetMapping(value = "/users/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> getUserByUsername(@PathVariable String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
 
@@ -94,10 +99,7 @@ public class AdminController {
         return ResponseEntity.badRequest().body(new MessageResponse("User not found"));
     }
 
-    @DeleteMapping(
-            value = "/users/{username}",
-            produces = MediaType.APPLICATION_JSON_VALUE
-    )
+    @DeleteMapping(value = "/users/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> deleteUser(@PathVariable String username) {
         Optional<User> userOptional = userRepository.findByUsername(username);
 

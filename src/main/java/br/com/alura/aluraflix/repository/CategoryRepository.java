@@ -11,9 +11,9 @@ public interface CategoryRepository {
 
     Optional<Category> findCategoryById(Integer id, String username);
 
-    Boolean insertOrUpdateCategory(Category category);
+    boolean insertOrUpdateCategory(Category category);
 
-    Boolean deleteCategory(Integer id, String username);
+    boolean deleteCategory(Integer id, String username);
 
-    Boolean existsById(Integer id, String username);
+    boolean existsById(Integer id, String username);
 }

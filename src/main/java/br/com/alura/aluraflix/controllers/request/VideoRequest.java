@@ -4,6 +4,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import org.hibernate.validator.constraints.URL;
 
+import br.com.alura.aluraflix.models.Category;
+
+import java.util.Objects;
+
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
@@ -33,5 +37,13 @@ public class VideoRequest {
         this.description = description;
         this.link = link;
         this.categoryId = categoryId;
+    }
+
+    public boolean setFreeCategory() {
+        if (Objects.isNull(this.categoryId)) {
+            this.categoryId = Category.FREE_CATEGORY;
+            return true;
+        }
+        return false;
     }
 }
