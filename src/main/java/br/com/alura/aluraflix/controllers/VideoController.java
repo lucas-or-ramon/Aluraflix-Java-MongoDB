@@ -32,10 +32,10 @@ import br.com.alura.aluraflix.repository.VideoRepository;
 import br.com.alura.aluraflix.security.jwt.JwtUtils;
 import br.com.alura.aluraflix.services.NextSequenceService;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/videos")
+@CrossOrigin(origins = "*", maxAge = 3600)
 @PreAuthorize("hasRole('USER')")
+@RequestMapping("/api/videos")
 public class VideoController {
 
     @Autowired
