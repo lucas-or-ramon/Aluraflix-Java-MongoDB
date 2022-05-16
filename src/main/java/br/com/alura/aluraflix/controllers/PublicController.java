@@ -2,114 +2,49 @@ package br.com.alura.aluraflix.controllers;
 
 import br.com.alura.aluraflix.controllers.request.LoginRequest;
 import br.com.alura.aluraflix.controllers.request.SignupRequest;
-import br.com.alura.aluraflix.controllers.response.JwtResponse;
 import br.com.alura.aluraflix.controllers.response.MessageResponse;
+import br.com.alura.aluraflix.controllers.response.UserResponse;
 import br.com.alura.aluraflix.controllers.response.VideoResponse;
-import br.com.alura.aluraflix.models.*;
-import br.com.alura.aluraflix.repository.RoleRepository;
-import br.com.alura.aluraflix.repository.UserRepository;
+import br.com.alura.aluraflix.models.Category;
+import br.com.alura.aluraflix.models.ERole;
+import br.com.alura.aluraflix.models.User;
+import br.com.alura.aluraflix.models.Video;
 import br.com.alura.aluraflix.repository.VideoRepository;
-import br.com.alura.aluraflix.security.jwt.JwtUtils;
-import br.com.alura.aluraflix.security.services.UserDetailsImpl;
+import br.com.alura.aluraflix.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RequestMapping("/start")
 public class PublicController {
 
-    @Autowired
-    JwtUtils jwtUtils;
+    private final VideoRepository videoRepository;
+    private final UserService userService;
 
     @Autowired
-    RoleRepository roleRepository;
-
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    PasswordEncoder passwordEncoder;
-
-    @Autowired
-    VideoRepository videoRepository;
-
-    @Autowired
-    AuthenticationManager authenticationManager;
+    public PublicController(VideoRepository videoRepository, UserService userService) {
+        this.videoRepository = videoRepository;
+        this.userService = userService;
+    }
 
     @PostMapping(value = "/signin", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
-
-        return ResponseEntity.ok(new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
-                userDetails.getEmail(), roles.get(0)));
+        return ResponseEntity.ok(userService.authenticateUser(loginRequest));
     }
 
     @PostMapping(value = "/signup", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
+    public ResponseEntity<UserResponse> registerUser(@Valid @RequestBody SignupRequest signupRequest) {
 
-        ResponseEntity<MessageResponse> response = isUsernameAndEmailValid(signupRequest);
-        if (response.getStatusCode().equals(HttpStatus.BAD_REQUEST))
-            return response;
-
-        String password = passwordEncoder.encode(signupRequest.getPassword());
-        User user = new User(signupRequest.getUsername(), signupRequest.getEmail(), password);
-
-        Set<Role> roles = new HashSet<>();
-        roles.add(getUserRole());
-
-        user.setRoles(roles);
-        userRepository.save(user);
-
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
-    }
-
-    private ResponseEntity<MessageResponse> isUsernameAndEmailValid(SignupRequest signupRequest) {
-        if (userRepository.existsByUsername(signupRequest.getUsername())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Username is already taken!"));
-        }
-
-        if (userRepository.existsByEmail(signupRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(new MessageResponse("Error: Email is already taken!"));
-        }
-        return ResponseEntity.ok(new MessageResponse(""));
-    }
-
-    private Role getUserRole() {
-        return roleRepository.findByName(ERole.ROLE_USER)
-                .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-    }
-
-    @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
-        SecurityContextHolder.getContext().setAuthentication(null);
-        return ResponseEntity.ok(new MessageResponse("Logout successful"));
+        return ResponseEntity.ok(userService.saveUser(signupRequest, ERole.ROLE_USER));
     }
 
     @GetMapping(value = "/free", produces = MediaType.APPLICATION_JSON_VALUE)

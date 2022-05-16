@@ -11,11 +11,14 @@ import java.util.stream.Collectors;
 @Data
 public class UserResponse {
 
-    @JsonProperty("username")
-    private String username;
-
     @JsonProperty("role")
     private String role;
+
+    @JsonProperty("message")
+    private String message;
+
+    @JsonProperty("username")
+    private String username;
 
     private UserResponse(User user) {
         this.username = user.getUsername();
@@ -25,11 +28,21 @@ public class UserResponse {
                 });
     }
 
+    public UserResponse(String role, String message, String username) {
+        this.role = role;
+        this.message = message;
+        this.username = username;
+    }
+
     public static UserResponse from(User user) {
         return new UserResponse(user);
     }
 
     public static List<UserResponse> fromList(List<User> users) {
         return users.stream().map(UserResponse::from).collect(Collectors.toList());
+    }
+
+    public static UserResponse from(String role, String message, String username) {
+        return new UserResponse(role, message, username);
     }
 }
