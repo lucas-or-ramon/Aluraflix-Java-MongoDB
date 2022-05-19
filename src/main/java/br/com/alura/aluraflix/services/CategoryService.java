@@ -1,48 +1,56 @@
 package br.com.alura.aluraflix.services;
 
+import br.com.alura.aluraflix.builder.QueryBuilder;
+import br.com.alura.aluraflix.controllers.response.CategoryResponse;
+import br.com.alura.aluraflix.exception.video.CategoryNotFoundException;
 import br.com.alura.aluraflix.models.Category;
-import br.com.alura.aluraflix.repository.CategoryRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CategoryService implements CategoryRepository {
+public class CategoryService {
+
+    private final MongoTemplate mongoTemplate;
 
     @Autowired
-    MongoTemplate mongoTemplate;
-
-    @Override
-    public Page<Category> findCategories(Pageable pageable, String username) {
-        try {
-            Query query = getQueryWithUserCriteria(username).with(pageable);
-            List<Category> categoryPage = mongoTemplate.find(query, Category.class);
-            
-            long count = mongoTemplate.count(query.skip(-1).limit(-1), Category.class);
-            return new PageImpl<>(categoryPage, pageable, count);
-        } catch (Exception e) {
-            return Page.empty();
-        }
+    public CategoryService(MongoTemplate mongoTemplate) {
+        this.mongoTemplate = mongoTemplate;
     }
 
-    @Override
-    public Optional<Category> findCategoryById(Integer id, String username) {
-        try {
-            return Optional.ofNullable(mongoTemplate.findOne(getQueryById(id, username), Category.class));
-        } catch (Exception e) {
-            return Optional.empty();
+    public List<CategoryResponse> findCategories(int pageNumber, String username) {
+        Pageable pageable = PageRequest.of(pageNumber, Category.PAGE_LIMIT);
+
+        var query = QueryBuilder.builder().withUsername(username).with(pageable).get();
+
+        List<Category> categories = mongoTemplate.find(query, Category.class);
+        long count = mongoTemplate.count(query.skip(-1).limit(-1), Category.class);
+        Page<Category> categoryPage = new PageImpl<>(categories, pageable, count);
+
+        if (categoryPage.isEmpty()) {
+            throw new CategoryNotFoundException("Categories Not Found");
         }
+
+        return CategoryResponse.fromList(categoryPage.toList());
     }
 
-    @Override
+    public CategoryResponse findCategoryById(Integer id, String username) {
+        var query = QueryBuilder.builder().withId(id).withUsername(username).get();
+        var category = Optional.ofNullable(mongoTemplate.findOne(query, Category.class));
+
+        return CategoryResponse.from(category.orElseThrow(() -> new CategoryNotFoundException("Category not found")));
+    }
+
     public boolean insertOrUpdateCategory(final Category category) {
         try {
             mongoTemplate.save(category);
@@ -52,7 +60,6 @@ public class CategoryService implements CategoryRepository {
         }
     }
 
-    @Override
     public boolean deleteCategory(Integer id, String username) {
         try {
             mongoTemplate.remove(getQueryById(id, username), Category.class);
@@ -62,7 +69,6 @@ public class CategoryService implements CategoryRepository {
         }
     }
 
-    @Override
     public boolean existsById(Integer id, String username) {
         try {
             return mongoTemplate.exists(getQueryById(id, username), Category.class);

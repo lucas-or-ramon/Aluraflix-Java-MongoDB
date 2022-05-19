@@ -39,11 +39,10 @@ public class VideoRequest {
         this.categoryId = categoryId;
     }
 
-    public boolean setFreeCategory() {
-        if (Objects.isNull(this.categoryId)) {
-            this.categoryId = Category.FREE_CATEGORY;
-            return true;
+    public Integer getCategoryId() {
+        if (Objects.isNull(categoryId)) {
+            return Category.FREE_CATEGORY;
         }
-        return false;
+        return categoryId;
     }
 }

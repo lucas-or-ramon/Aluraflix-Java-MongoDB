@@ -1,4 +1,4 @@
-package br.com.alura.aluraflix.exception;
+package br.com.alura.aluraflix.exception.user;
 
 public class UserNotFoundException extends RuntimeException {
 

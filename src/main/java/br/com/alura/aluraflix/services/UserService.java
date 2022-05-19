@@ -4,8 +4,8 @@ import br.com.alura.aluraflix.controllers.request.LoginRequest;
 import br.com.alura.aluraflix.controllers.request.SignupRequest;
 import br.com.alura.aluraflix.controllers.response.JwtResponse;
 import br.com.alura.aluraflix.controllers.response.UserResponse;
-import br.com.alura.aluraflix.exception.UserAlreadyExistsException;
-import br.com.alura.aluraflix.exception.UserNotFoundException;
+import br.com.alura.aluraflix.exception.user.UserAlreadyExistsException;
+import br.com.alura.aluraflix.exception.user.UserNotFoundException;
 import br.com.alura.aluraflix.models.ERole;
 import br.com.alura.aluraflix.models.Role;
 import br.com.alura.aluraflix.models.User;
@@ -49,13 +49,14 @@ public class UserService {
     }
 
     public JwtResponse authenticateUser(@Valid LoginRequest loginRequest) {
-        var authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
+        var authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String jwt = jwtUtils.generateJwtToken(authentication);
+        var jwt = jwtUtils.generateJwtToken(authentication);
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-        List<String> roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+        var roles = userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
 
         return new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(), userDetails.getEmail(), roles.get(0));

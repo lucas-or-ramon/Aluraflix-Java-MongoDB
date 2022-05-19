@@ -1,6 +1,6 @@
 package br.com.alura.aluraflix.services;
 
-import br.com.alura.aluraflix.exception.RoleNotFoundException;
+import br.com.alura.aluraflix.exception.user.RoleNotFoundException;
 import br.com.alura.aluraflix.models.ERole;
 import br.com.alura.aluraflix.models.Role;
 import br.com.alura.aluraflix.repository.RoleRepository;
